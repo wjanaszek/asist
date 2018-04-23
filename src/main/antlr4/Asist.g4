@@ -4,13 +4,13 @@ grammar Asist;
  * Parser Rules
  */
 script: statement+;
-statement: importStatement | notificationStatement | variableOrAssignment | functionCall | ifStatement;
+statement: importStatement | notificationStatement | variableOrAssignment | functionCall | ifStatement | searchFunction;
 
 // IMPORT
 importStatement: IMPORT IDENTIFIER;
 
 // NOTIFICATION
-notificationStatement: NOTIFY IDENTIFIER firedWhen STRING actionType;
+notificationStatement: NOTIFY IDENTIFIER firedWhen STRING 'with' actionType;
 firedWhen: timeBased | timePrecisely | onEvent;
 // time based
 timeBased: ('every' | 'in') (singleTime | pluralTime);
@@ -40,7 +40,7 @@ multiplyExpression: atomExpression ('*' atomExpression | ':' atomExpression)*;
 atomExpression: INTEGER_NUMBER | IDENTIFIER;
 
 // FUNCTION CALL
-functionCall: IDENTIFIER '->' '(' params ')';
+functionCall: IDENTIFIER '->' '(' params? ')';
 params: 'all' | IDENTIFIER+ | INTEGER_NUMBER+ | STRING+;
 
 // IF/ELSE STATEMENT
@@ -49,7 +49,7 @@ conditionExpression: simpleExpression (RELATIVE_OPERATOR simpleExpression)*;
 instructions: (searchFunction | variableOrAssignment | ifStatement | notificationStatement | functionCall)+;
 simpleExpression: term ('or' term)*;
 term: factor ('and' factor)*;
-factor: variable | '(' arithmeticOperation ')' | 'not' factor | INTEGER_NUMBER;
+factor: variable | '(' arithmeticOperation ')' | 'not' factor | INTEGER_NUMBER | objectProperties;
 
 /*
  * Lexer Rules
@@ -57,6 +57,7 @@ factor: variable | '(' arithmeticOperation ')' | 'not' factor | INTEGER_NUMBER;
 IMPORT: I M P O R T;
 NOTIFY: N O T I F Y;
 IDENTIFIER: LETTER (LETTER | DIGIT | '_')*;
+SEARCH_FUNCTION: 'list all';
 STRING: '"' (LETTER | .)*? '"' | '\'' (LETTER | .)*? '\'';
 INTEGER_NUMBER: NON_ZERO_DIGIT DIGIT*;
 HOUR: DIGIT DIGIT;
@@ -65,7 +66,6 @@ DAY: DIGIT DIGIT;
 MONTH: DIGIT DIGIT;
 YEAR: DIGIT DIGIT DIGIT DIGIT;
 BOOLEAN: 'true' | 'false';
-SEARCH_FUNCTION: 'list all';
 OBJECT_PROPERTIES: IDENTIFIER '.' IDENTIFIER ('.' IDENTIFIER)*;
 TIME: HOUR '/' MINUTE;
 DATE: DAY '/' MONTH '/' YEAR;
