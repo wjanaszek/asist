@@ -18,7 +18,19 @@ variableAssignment: IDENTIFIER '=' expression;
 
 functionCall: FUNCTION;
 
-expression: FUNCTION;
+expression: STRING | INTEGER_NUMBER | BOOLEAN | searchFunction | OBJECT_OR_FUNCTION_PROPERTIES | arithmeticOperation;
+
+searchFunction: SEARCH_FUNCTION ('| grep' STRING)?;
+
+arithmeticOperation: additionExpression;
+
+/* Addition and subtraction have the lowest precedence. */
+additionExpression: multiplyExpression ('+' multiplyExpression | '-' multiplyExpression)*;
+
+/* Multiplication and division have a higher precedence. */
+multiplyExpression: atomExpression ('*' atomExpression | '/' atomExpression)*;
+
+atomExpression: INTEGER_NUMBER | IDENTIFIER;
 
 /*
  * Lexer Rules
@@ -27,13 +39,14 @@ IMPORT: I M P O R T;
 NOTIFY: N O T I F Y;
 FUNCTION: F U N C T I O N;
 IDENTIFIER: LETTER (LETTER | DIGIT | '_')*;
-ID: LETTER (LETTER | DIGIT | SPECIAL_CHARACTER)*;
 STRING: '"' (LETTER | .)*? '"' | '\'' (LETTER | .)*? '\'';
 INTEGER_NUMBER: NON_ZERO_DIGIT DIGIT*;
 BOOLEAN: 'true' | 'false';
-SEARCH_FUNCTION: 'list all' ('| grep' PARAM)?;
-PARAM: ID;
-
+SEARCH_FUNCTION: 'list all';
+OBJECT_OR_FUNCTION_PROPERTIES: IDENTIFIER '.' IDENTIFIER;
+ARITHMETIC_OPERATION: OPERAND ARITHMETIC_OPERATOR OPERAND (ARITHMETIC_OPERATOR OPERAND)*;
+OPERAND: INTEGER_NUMBER | IDENTIFIER;
+ARITHMETIC_OPERATOR: '+' | '-' | '*' | ':';
 WHITESPACE: [ \t] -> skip;
 LINE_COMMENT : '//' .*? NEW_LINE -> skip ;
 COMMENT: '/*' .*? '*/' -> skip ;
