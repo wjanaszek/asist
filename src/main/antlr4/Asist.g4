@@ -41,10 +41,10 @@ atomExpression: INTEGER_NUMBER | IDENTIFIER;
 
 // FUNCTION CALL
 functionCall: IDENTIFIER '->' '(' params ')';
-params: 'all' | IDENTIFIER+ | INTEGER_NUMBER+;
+params: 'all' | IDENTIFIER+ | INTEGER_NUMBER+ | STRING+;
 
 // IF/ELSE STATEMENT
-ifStatement: 'if (' conditionExpression ') then' instructions ('else' instructions 'endif')?;
+ifStatement: 'if (' conditionExpression ') then' instructions ('else' instructions)? 'endif';
 conditionExpression: simpleExpression (RELATIVE_OPERATOR simpleExpression)*;
 instructions: (searchFunction | variableOrAssignment | ifStatement | notificationStatement | functionCall)+;
 simpleExpression: term ('or' term)*;
