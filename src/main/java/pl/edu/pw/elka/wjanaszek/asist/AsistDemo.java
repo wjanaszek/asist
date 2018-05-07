@@ -7,11 +7,18 @@ import pl.edu.pw.elka.wjanaszek.asist.parser.ParserImpl;
 public class AsistDemo {
     private static final String sourceCode =
             "c = a * 3 + 2 - 5 : b\n" +
-            "a = list.test.property\n" + "import mail\n" +
+            "a = list.test.property\n" +
+            "import mail\n" +
             "a = 5 * 5 + 2\n" +
             "print->(ddd, \"afasf\", afafs, 5)\n" +
             "notify blablabla every 5 seconds \"ioioio\" with os_notification\n" +
-            "list all | grep \"test\"\n";
+            "list all | grep \"test\"\n" +
+            "if ((a : 2) == 5) then \n" +
+                    "    a = 10\n" +
+                    "    print->(a)\n" +
+                    "else\n" +
+                    "    a = 50\n" +
+                    "endif";
 
     public static void main(String[] args) {
         final Script result = new ParserImpl().parse(sourceCode);
