@@ -159,33 +159,8 @@ public class ParserImpl implements Parser {
                     SearchFunctionVisitor searchFunctionVisitor = new SearchFunctionVisitor();
                     variableOrAssignment.setSearchFunction(searchFunctionVisitor.visitSearchFunction(c.searchFunction()));
                 } else if (c.objectProperties() != null) {
-//                    List<String> properties = Stream.of(c.objectProperties().OBJECT_PROPERTIES()
-//                            .getText()
-//                            .split("\\."))
-//                            .collect(Collectors.toList());
                     variableOrAssignment.setObjectProperties(objectPropertiesVisitor(c.objectProperties()));
                 } else if (c.arithmeticOperation() != null) {
-//                    List<MultiplyExpression> multiplyExpressionList = new ArrayList<>();
-//                    for (AsistParser.MultiplyExpressionContext context : c.arithmeticOperation().additionExpression().multiplyExpression()) {
-//                        MultiplyExpression multiplyExpression = new MultiplyExpression();
-//                        // atom expression list for current multiply expression
-//                        multiplyExpression.setAtomExpressionList(context.atomExpression()
-//                                .stream()
-//                                .map(a -> StringUtils.isNumeric(a.getText()) ? new AtomExpression(null, Integer.valueOf(a.getText()))
-//                                        : new AtomExpression(a.getText(), null))
-//                                .collect(Collectors.toList()));
-//                        // operator list for current multiply expression
-//                        multiplyExpression.setOperatorList(context.MULTIPLICATION_OPERATOR()
-//                                .stream()
-//                                .map(o -> MultiplicationOperator.fromString(o.getText()))
-//                                .collect(Collectors.toList()));
-//                        multiplyExpressionList.add(multiplyExpression);
-//                    }
-//                    List<AdditionOperator> additionOperatorList = c.arithmeticOperation().additionExpression().ADDITION_OPERATOR()
-//                            .stream()
-//                            .map(o -> AdditionOperator.fromString(o.getText()))
-//                            .collect(Collectors.toList());
-//                    ArithmeticOperation arithmeticOperation = new ArithmeticOperation(multiplyExpressionList, additionOperatorList);
                     variableOrAssignment.setArithmeticOperation(arithmeticOperationVisitor(c.arithmeticOperation()));
                 } else if (c.functionCall() != null) {
                     FunctionCallVisitor functionCallVisitor = new FunctionCallVisitor();
@@ -260,26 +235,7 @@ public class ParserImpl implements Parser {
             if (ctx.ifInstructions() != null) {
                 ifInstructions = ctx.ifInstructions().instruction()
                         .stream()
-                        .map(i -> mapToInstruction(i)
-//                            Instruction instruction = new Instruction();
-//                            if (i.searchFunction() != null) {
-//                                SearchFunctionVisitor searchFunctionVisitor = new SearchFunctionVisitor();
-//                                instruction.setSearchFunction(searchFunctionVisitor.visitSearchFunction(i.searchFunction()));
-//                            } else if (i.variableOrAssignment() != null) {
-//                                VariableOrAssignmentVisitor variableOrAssignmentVisitor = new VariableOrAssignmentVisitor();
-//                                instruction.setVariableOrAssignment(variableOrAssignmentVisitor.visitVariableOrAssignment(i.variableOrAssignment()));
-//                            } else if (i.ifStatement() != null) {
-//                                IfStatementVisitor ifStatementVisitor = new IfStatementVisitor();
-//                                instruction.setIfStatement(ifStatementVisitor.visitIfStatement(i.ifStatement()));
-//                            } else if (i.notificationStatement() != null) {
-//                                NotificationStatementVisitor notificationStatementVisitor = new NotificationStatementVisitor();
-//                                instruction.setNotificationStatement(notificationStatementVisitor.visitNotificationStatement(i.notificationStatement()));
-//                            } else if (i.functionCall() != null) {
-//                                FunctionCallVisitor functionCallVisitor = new FunctionCallVisitor();
-//                                instruction.setFunctionCall(functionCallVisitor.visitFunctionCall(i.functionCall()));
-//                            }
-//                            return instruction;
-                        )
+                        .map(i -> mapToInstruction(i))
                         .collect(Collectors.toList());
             }
             if (ctx.elseInstructions() != null) {
