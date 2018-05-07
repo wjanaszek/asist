@@ -13,40 +13,51 @@ importStatement: IMPORT IDENTIFIER;
 notificationStatement: NOTIFY IDENTIFIER firedWhen STRING 'with' actionType;
 firedWhen: timeBased | timePrecisely | onEvent;
 // time based
-timeBased: ('every' | 'in') (singleTime | pluralTime);
-singleTime: 'second' | 'minute' | 'hour';
-pluralTime: INTEGER_NUMBER ('seconds' | 'minutes' | 'hours');
+timeBased: (every | in) (singleTime | pluralTime);
+singleTime: second | minute | hour;
+pluralTime: INTEGER_NUMBER (seconds | minutes | hours);
 actionType: 'os_notification' | IDENTIFIER;
 // time precisely
 timePrecisely: 'on' TIME DATE?;
 // on event
 onEvent: 'when' IDENTIFIER+;
+every: 'every';
+in: 'in';
+second: 'second';
+seconds: 'seconds';
+minute: 'minute';
+minutes: 'minutes';
+hour: 'hour';
+hours: 'hours';
 
 // VARIABLE OR ASSIGNMENT
 variableOrAssignment: variable | variableAssignment;
 variable: IDENTIFIER;
 variableAssignment: IDENTIFIER '=' expression;
-expression: assignVariable | STRING | INTEGER_NUMBER | booleanExpression | searchFunction | objectProperties
-            | arithmeticOperation | functionCall;
+expression: STRING | INTEGER_NUMBER | booleanExpression | searchFunction | objectProperties
+            | arithmeticOperation | functionCall | assignVariable;
 assignVariable: IDENTIFIER;
-booleanExpression: 'true' | 'false';
+booleanExpression: TRUE | FALSE;
+
 searchFunction: SEARCH_FUNCTION ('| grep' STRING)?;
 objectProperties: OBJECT_PROPERTIES;
 arithmeticOperation: additionExpression;
 /* Addition and subtraction have the lowest precedence. */
-additionExpression: multiplyExpression ('+' multiplyExpression | '-' multiplyExpression)*;
+additionExpression: multiplyExpression (ADDITION_OPERATOR multiplyExpression)*;
 /* Multiplication and division have a higher precedence. */
-multiplyExpression: atomExpression ('*' atomExpression | ':' atomExpression)*;
+multiplyExpression: atomExpression (MULTIPLICATION_OPERATOR atomExpression)*;
 atomExpression: INTEGER_NUMBER | IDENTIFIER;
 
 // FUNCTION CALL
 functionCall: IDENTIFIER '->' '(' params? ')';
-params: 'all' | IDENTIFIER+ | INTEGER_NUMBER+ | STRING+;
+params: ALL | (IDENTIFIER | INTEGER_NUMBER | STRING) (',' params)*;
 
 // IF/ELSE STATEMENT
-ifStatement: 'if (' conditionExpression ') then' instructions ('else' instructions)? 'endif';
+ifStatement: 'if (' conditionExpression ') then' ifInstructions ('else' elseInstructions)? 'endif';
 conditionExpression: simpleExpression (RELATIVE_OPERATOR simpleExpression)*;
-instructions: (searchFunction | variableOrAssignment | ifStatement | notificationStatement | functionCall)+;
+ifInstructions: instruction+;
+elseInstructions: instruction+;
+instruction: searchFunction | variableOrAssignment | ifStatement | notificationStatement | functionCall;
 simpleExpression: term ('or' term)*;
 term: factor ('and' factor)*;
 factor: variable | '(' arithmeticOperation ')' | 'not' factor | INTEGER_NUMBER | objectProperties;
@@ -54,6 +65,9 @@ factor: variable | '(' arithmeticOperation ')' | 'not' factor | INTEGER_NUMBER |
 /*
  * Lexer Rules
  */
+TRUE: T R U E;
+FALSE: F A L S E;
+ALL: A L L;
 IMPORT: I M P O R T;
 NOTIFY: N O T I F Y;
 IDENTIFIER: LETTER (LETTER | DIGIT | '_')*;
@@ -69,6 +83,9 @@ BOOLEAN: 'true' | 'false';
 OBJECT_PROPERTIES: IDENTIFIER '.' IDENTIFIER ('.' IDENTIFIER)*;
 TIME: HOUR '/' MINUTE;
 DATE: DAY '/' MONTH '/' YEAR;
+
+ADDITION_OPERATOR: '+' | '-';
+MULTIPLICATION_OPERATOR: '*' | ':';
 
 RELATIVE_OPERATOR: '==' | '<' | '>' | '<=' | '!=' | '>=';
 WHITESPACE: [ \t] -> skip;
