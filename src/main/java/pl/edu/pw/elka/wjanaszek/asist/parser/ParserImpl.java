@@ -153,7 +153,6 @@ public class ParserImpl implements Parser {
                 } else if (c.INTEGER_NUMBER() != null) {
                     variableOrAssignment.setIntegerValue(Integer.valueOf(c.INTEGER_NUMBER().getText()));
                 } else if (c.booleanExpression() != null) {
-                    System.out.println("Boolean = " + c.booleanExpression().getText());
                     variableOrAssignment.setBooleanValue(Boolean.valueOf(c.booleanExpression().getText()));
                 } else if (c.searchFunction() != null) {
                     SearchFunctionVisitor searchFunctionVisitor = new SearchFunctionVisitor();
@@ -177,13 +176,12 @@ public class ParserImpl implements Parser {
 
         public FunctionCall visitFunctionCall(AsistParser.FunctionCallContext ctx) {
             String identifier = ctx.IDENTIFIER().getText();
-            List<String> params = null;
-            if (ctx.params().params() != null) {
-                params = ctx.params().params()
+            List<String> params = new ArrayList<>();
+            if (ctx.params() != null) {
+                params = ctx.params().children
                         .stream()
                         .map(i -> i.getText())
                         .collect(Collectors.toList());
-                params.add(0, ctx.params().getText());
             }
             return new FunctionCall(identifier, params);
         }

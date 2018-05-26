@@ -50,7 +50,7 @@ atomExpression: INTEGER_NUMBER | IDENTIFIER;
 
 // FUNCTION CALL
 functionCall: IDENTIFIER '->' '(' params? ')';
-params: ALL | (IDENTIFIER | INTEGER_NUMBER | STRING) (',' params)*;
+params: ALL | (IDENTIFIER | INTEGER_NUMBER | STRING)*;
 
 // IF/ELSE STATEMENT
 ifStatement: 'if (' conditionExpression ') then' ifInstructions ('else' elseInstructions)? 'endif';
