@@ -68,6 +68,7 @@ public class NotificationTask extends BaseTask {
             this.timer.cancel();
             this.timer.purge();
         } else {
+            this.timer = new Timer(this.title);
             this.active = !this.active;
             Notification notification = new Notification(this.message, this.title);
             if (this.date != null) {
