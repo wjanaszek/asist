@@ -68,6 +68,7 @@ public class NotificationTask extends BaseTask {
             this.timer.cancel();
             this.timer.purge();
         } else {
+            this.active = !this.active;
             Notification notification = new Notification(this.message, this.title);
             if (this.date != null) {
                 this.timer.schedule(notification, this.date);
@@ -91,5 +92,11 @@ public class NotificationTask extends BaseTask {
                 }
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
+
     }
 }

@@ -10,19 +10,13 @@ import pl.edu.pw.elka.wjanaszek.asist.domain.task.NotificationTask;
 import pl.edu.pw.elka.wjanaszek.asist.domain.variable.VariableOrAssignment;
 import pl.edu.pw.elka.wjanaszek.asist.parser.ParserImpl;
 
-import java.awt.*;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -169,13 +163,13 @@ public class AsistDemo {
                 TimeBased timeBased = statement.getFiredWhen().getTimeBased();
                 if (statement.getFiredWhen().getTimeBased().getType() == TimeBasedType.IN) {
                     if (timeBased.getPluralTimeType() != null) {
-                        seconds = timeBased.getPluralTimeType() == PluralTimeType.SECONDS ? timeBased.getValue()*1000 : null;
-                        minutes = timeBased.getPluralTimeType() == PluralTimeType.MINUTES ? timeBased.getValue()*60*1000 : null;
-                        hours = timeBased.getPluralTimeType() == PluralTimeType.HOURS ? timeBased.getValue()*60*60*1000 : null;
+                        seconds = timeBased.getPluralTimeType() == PluralTimeType.SECONDS ? timeBased.getValue() * 1000 : null;
+                        minutes = timeBased.getPluralTimeType() == PluralTimeType.MINUTES ? timeBased.getValue() * 60 * 1000 : null;
+                        hours = timeBased.getPluralTimeType() == PluralTimeType.HOURS ? timeBased.getValue() * 60 * 60 * 1000 : null;
                     } else if (timeBased.getSingleTimeType() != null) {
-                        seconds = timeBased.getSingleTimeType() == SingleTimeType.SECOND ? timeBased.getValue()*1000 : null;
-                        minutes = timeBased.getSingleTimeType() == SingleTimeType.MINUTE ? timeBased.getValue()*60*1000 : null;
-                        hours = timeBased.getSingleTimeType() == SingleTimeType.HOUR ? timeBased.getValue()*60*60*1000 : null;
+                        seconds = timeBased.getSingleTimeType() == SingleTimeType.SECOND ? timeBased.getValue() * 1000 : null;
+                        minutes = timeBased.getSingleTimeType() == SingleTimeType.MINUTE ? timeBased.getValue() * 60 * 1000 : null;
+                        hours = timeBased.getSingleTimeType() == SingleTimeType.HOUR ? timeBased.getValue() * 60 * 60 * 1000 : null;
                     }
                     if (seconds != null) {
                         task.setDelay(seconds);
@@ -189,13 +183,13 @@ public class AsistDemo {
                     }
                 } else if (statement.getFiredWhen().getTimeBased().getType() == TimeBasedType.EVERY) {
                     if (timeBased.getPluralTimeType() != null) {
-                        seconds = timeBased.getPluralTimeType() == PluralTimeType.SECONDS ? timeBased.getValue()*1000 : null;
-                        minutes = timeBased.getPluralTimeType() == PluralTimeType.MINUTES ? timeBased.getValue()*60*1000 : null;
-                        hours = timeBased.getPluralTimeType() == PluralTimeType.HOURS ? timeBased.getValue()*60*60*1000 : null;
+                        seconds = timeBased.getPluralTimeType() == PluralTimeType.SECONDS ? timeBased.getValue() * 1000 : null;
+                        minutes = timeBased.getPluralTimeType() == PluralTimeType.MINUTES ? timeBased.getValue() * 60 * 1000 : null;
+                        hours = timeBased.getPluralTimeType() == PluralTimeType.HOURS ? timeBased.getValue() * 60 * 60 * 1000 : null;
                     } else if (timeBased.getSingleTimeType() != null) {
-                        seconds = timeBased.getSingleTimeType() == SingleTimeType.SECOND ? timeBased.getValue()*1000 : null;
-                        minutes = timeBased.getSingleTimeType() == SingleTimeType.MINUTE ? timeBased.getValue()*60*1000 : null;
-                        hours = timeBased.getSingleTimeType() == SingleTimeType.HOUR ? timeBased.getValue()*60*60*1000 : null;
+                        seconds = timeBased.getSingleTimeType() == SingleTimeType.SECOND ? timeBased.getValue() * 1000 : null;
+                        minutes = timeBased.getSingleTimeType() == SingleTimeType.MINUTE ? timeBased.getValue() * 60 * 1000 : null;
+                        hours = timeBased.getSingleTimeType() == SingleTimeType.HOUR ? timeBased.getValue() * 60 * 60 * 1000 : null;
                     }
                     if (seconds != null) {
                         task.setPeriod(seconds);
@@ -258,12 +252,16 @@ public class AsistDemo {
     private static int searchFunction(SearchFunction statement) throws IllegalStateException {
         int value = 0;
         if (statement.getParam() != null) {
-            value = notificationMap.keySet().stream().map(n -> {
-                if (n.equals(statement.getParam())) {
-                    System.out.println("ID = " + n + ", " + notificationMap.get(n).toString());
-                }
-                return n;
-            })
+            value = notificationMap.keySet().stream()
+                    .map(n -> {
+                        String param = statement.getParam();
+                        param = param.replace("\"", "");
+                        param = param.replace("\'", "");
+                        if (n.equals(param)) {
+                            System.out.println("ID = " + n + ", " + notificationMap.get(n).toString());
+                        }
+                        return n;
+                    })
                     .collect(Collectors.toList()).size();
         } else {
             notificationMap.keySet().forEach(n -> {

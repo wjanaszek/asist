@@ -23,4 +23,19 @@ public class BaseTask {
 
     public void toggleNotification() {
     }
+
+    @Override
+    public String toString() {
+        String result = "title: " + title + ", message: " + message + ", active: " + active;
+        if (seconds != null) {
+            result += ", seconds: " + seconds / 1000;
+        } else if (minutes != null) {
+            result += ", minutes: " + minutes / 60*1000;
+        } else if (hours != null) {
+            result += ", hours: " + hours / 60*60*1000;
+        } else if (date != null) {
+            result += ", date: " + date;
+        }
+        return result;
+    }
 }
