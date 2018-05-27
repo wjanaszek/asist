@@ -120,7 +120,9 @@ public class ParserImpl implements Parser {
                     timeBased.setValue(1);
                 }
             } else if (ctx.firedWhen().timePrecisely() != null) {
-                timePrecisely.setDate(ctx.firedWhen().timePrecisely().DATE().getText());
+                if (ctx.firedWhen().timePrecisely().DATE() != null) {
+                    timePrecisely.setDate(ctx.firedWhen().timePrecisely().DATE().getText());
+                }
                 timePrecisely.setTime(ctx.firedWhen().timePrecisely().TIME().getText());
             } else if (ctx.firedWhen().onEvent() != null) {
                 onEvent.setIdentifier(ctx.firedWhen().onEvent().IDENTIFIER()

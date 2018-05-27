@@ -34,8 +34,8 @@ hours: 'hours';
 variableOrAssignment: variable | variableAssignment;
 variable: IDENTIFIER;
 variableAssignment: IDENTIFIER '=' expression;
-expression: STRING | INTEGER_NUMBER | booleanExpression | searchFunction | objectProperties
-            | arithmeticOperation | functionCall | assignVariable;
+expression: STRING | INTEGER_NUMBER | assignVariable | booleanExpression | searchFunction | objectProperties
+            | arithmeticOperation | functionCall;
 assignVariable: IDENTIFIER;
 booleanExpression: TRUE | FALSE;
 

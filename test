@@ -1,0 +1,2 @@
+print->('Hello word')
+notify test on 18/58 'test message' with os_notification

@@ -1334,6 +1334,9 @@ public class AsistParser extends Parser {
 	public static class ExpressionContext extends ParserRuleContext {
 		public TerminalNode STRING() { return getToken(AsistParser.STRING, 0); }
 		public TerminalNode INTEGER_NUMBER() { return getToken(AsistParser.INTEGER_NUMBER, 0); }
+		public AssignVariableContext assignVariable() {
+			return getRuleContext(AssignVariableContext.class,0);
+		}
 		public BooleanExpressionContext booleanExpression() {
 			return getRuleContext(BooleanExpressionContext.class,0);
 		}
@@ -1348,9 +1351,6 @@ public class AsistParser extends Parser {
 		}
 		public FunctionCallContext functionCall() {
 			return getRuleContext(FunctionCallContext.class,0);
-		}
-		public AssignVariableContext assignVariable() {
-			return getRuleContext(AssignVariableContext.class,0);
 		}
 		public ExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
@@ -1396,42 +1396,42 @@ public class AsistParser extends Parser {
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(170);
-				booleanExpression();
+				assignVariable();
 				}
 				break;
 			case 4:
 				enterOuterAlt(_localctx, 4);
 				{
 				setState(171);
-				searchFunction();
+				booleanExpression();
 				}
 				break;
 			case 5:
 				enterOuterAlt(_localctx, 5);
 				{
 				setState(172);
-				objectProperties();
+				searchFunction();
 				}
 				break;
 			case 6:
 				enterOuterAlt(_localctx, 6);
 				{
 				setState(173);
-				arithmeticOperation();
+				objectProperties();
 				}
 				break;
 			case 7:
 				enterOuterAlt(_localctx, 7);
 				{
 				setState(174);
-				functionCall();
+				arithmeticOperation();
 				}
 				break;
 			case 8:
 				enterOuterAlt(_localctx, 8);
 				{
 				setState(175);
-				assignVariable();
+				functionCall();
 				}
 				break;
 			}
@@ -2651,10 +2651,10 @@ public class AsistParser extends Parser {
 		"\u00a3\5*\26\2\u00a1\u00a3\5,\27\2\u00a2\u00a0\3\2\2\2\u00a2\u00a1\3\2"+
 		"\2\2\u00a3)\3\2\2\2\u00a4\u00a5\7 \2\2\u00a5+\3\2\2\2\u00a6\u00a7\7 \2"+
 		"\2\u00a7\u00a8\7\17\2\2\u00a8\u00a9\5.\30\2\u00a9-\3\2\2\2\u00aa\u00b3"+
-		"\7\"\2\2\u00ab\u00b3\7#\2\2\u00ac\u00b3\5\62\32\2\u00ad\u00b3\5\64\33"+
-		"\2\u00ae\u00b3\5\66\34\2\u00af\u00b3\58\35\2\u00b0\u00b3\5@!\2\u00b1\u00b3"+
-		"\5\60\31\2\u00b2\u00aa\3\2\2\2\u00b2\u00ab\3\2\2\2\u00b2\u00ac\3\2\2\2"+
-		"\u00b2\u00ad\3\2\2\2\u00b2\u00ae\3\2\2\2\u00b2\u00af\3\2\2\2\u00b2\u00b0"+
+		"\7\"\2\2\u00ab\u00b3\7#\2\2\u00ac\u00b3\5\60\31\2\u00ad\u00b3\5\62\32"+
+		"\2\u00ae\u00b3\5\64\33\2\u00af\u00b3\5\66\34\2\u00b0\u00b3\58\35\2\u00b1"+
+		"\u00b3\5@!\2\u00b2\u00aa\3\2\2\2\u00b2\u00ab\3\2\2\2\u00b2\u00ac\3\2\2"+
+		"\2\u00b2\u00ad\3\2\2\2\u00b2\u00ae\3\2\2\2\u00b2\u00af\3\2\2\2\u00b2\u00b0"+
 		"\3\2\2\2\u00b2\u00b1\3\2\2\2\u00b3/\3\2\2\2\u00b4\u00b5\7 \2\2\u00b5\61"+
 		"\3\2\2\2\u00b6\u00b7\t\3\2\2\u00b7\63\3\2\2\2\u00b8\u00bb\7!\2\2\u00b9"+
 		"\u00ba\7\20\2\2\u00ba\u00bc\7\"\2\2\u00bb\u00b9\3\2\2\2\u00bb\u00bc\3"+

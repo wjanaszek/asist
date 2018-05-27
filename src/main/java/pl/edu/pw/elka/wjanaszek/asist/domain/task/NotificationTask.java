@@ -1,4 +1,4 @@
-package pl.edu.pw.elka.wjanaszek.asist;
+package pl.edu.pw.elka.wjanaszek.asist.domain.task;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -10,11 +10,7 @@ import java.util.TimerTask;
 
 @Getter
 @Setter
-public class NotificationTask {
-    private String message;
-    private String title;
-    private Boolean active;
-    private Timer timer;
+public class NotificationTask extends BaseTask {
 
     class Notification extends TimerTask {
         private String message;
@@ -64,6 +60,8 @@ public class NotificationTask {
         this.message = message;
         this.title = title;
         this.timer = new Timer(title);
+        this.delay = 0;
+        this.period = 0;
     }
 
     public void toggleNotification() {
@@ -72,7 +70,29 @@ public class NotificationTask {
             this.timer.cancel();
             this.timer.purge();
         } else {
-            this.timer.schedule(new Notification(this.message, this.title), 0, 1*1000);
+            Notification notification = new Notification(this.message, this.title);
+            if (this.date != null) {
+                this.timer.schedule(notification, this.date);
+                System.out.println("task with date " + this.date.toString());
+            } else if (this.seconds != null) {
+                if (this.delay != null) {
+                    this.timer.schedule(notification, this.seconds);
+                } else if (this.period != null) {
+                    this.timer.schedule(notification, 0, this.seconds);
+                }
+            } else if (this.minutes != null) {
+                if (this.delay != null) {
+                    this.timer.schedule(notification, this.minutes);
+                } else if (this.period != null) {
+                    this.timer.schedule(notification, 0, this.minutes);
+                }
+            } else if (this.hours != null) {
+                if (this.delay != null) {
+                    this.timer.schedule(notification, this.hours);
+                } else if (this.period != null) {
+                    this.timer.schedule(notification, 0, this.hours);
+                }
+            }
         }
     }
 }

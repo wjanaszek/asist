@@ -16,7 +16,3 @@ public class MultiplyExpression {
     List<AtomExpression> atomExpressionList;
     List<MultiplicationOperator> operatorList;
 }
-
-//if ((a*3 + 2 + 5 - 2) == 5) then
-//        c
-//        endif
