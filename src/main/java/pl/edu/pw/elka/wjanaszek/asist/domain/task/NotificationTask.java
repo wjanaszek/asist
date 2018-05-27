@@ -60,8 +60,6 @@ public class NotificationTask extends BaseTask {
         this.message = message;
         this.title = title;
         this.timer = new Timer(title);
-        this.delay = 0;
-        this.period = 0;
     }
 
     public void toggleNotification() {
@@ -73,7 +71,6 @@ public class NotificationTask extends BaseTask {
             Notification notification = new Notification(this.message, this.title);
             if (this.date != null) {
                 this.timer.schedule(notification, this.date);
-                System.out.println("task with date " + this.date.toString());
             } else if (this.seconds != null) {
                 if (this.delay != null) {
                     this.timer.schedule(notification, this.seconds);

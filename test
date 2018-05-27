@@ -1,2 +1,3 @@
 print->('Hello word')
-notify test on 18/58 'test message' with os_notification
+notify test every 1 minute 'test message' with os_notification
+notify test2 every 10 seconds 'test message 2' with os_notification

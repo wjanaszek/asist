@@ -51,6 +51,8 @@ public class AsistDemo {
                 } catch (IllegalStateException e) {
                     if (e.getMessage().equals("unknown")) {
                         System.err.println("Unknown error occured");
+                    } else if (e.getMessage().startsWith("Duplicated id")) {
+                        System.err.println(e.getMessage());
                     } else {
                         System.err.println("No element " + e.getMessage() + " found");
                     }
@@ -152,6 +154,9 @@ public class AsistDemo {
     private static void notification(NotificationStatement statement) throws IllegalStateException {
         if (statement.getActionType().toLowerCase().equals("os_notification")) {
             System.out.println("task to dispatch: " + statement.toString());
+            if (notificationMap.containsKey(statement.getIdentifier())) {
+                throw new IllegalStateException("Duplicate id " + statement.getIdentifier());
+            }
             NotificationTask task = new NotificationTask(
                     false,
                     statement.getMessage(),
