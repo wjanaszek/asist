@@ -354,42 +354,115 @@ public class AsistDemo {
     private static String arithmeticOperation(ArithmeticOperation a) {
         List<MultiplyExpression> multiplyExpressionList = a.getMultiplyExpressionList();
         List<AdditionOperator> additionOperatorList = a.getOperatorList();
+        List<String> values = new ArrayList<>();
+        List<AdditionOperator> operators = new ArrayList<>(additionOperatorList);
 
-        for (MultiplyExpression exp : multiplyExpressionList) {
-            List<Integer> resultList = new ArrayList<>();
-            if (exp.getAtomExpressionList().size() == exp.getOperatorList().size() + 1) {
-                List<Integer> tmpResult = new ArrayList<>();
-                for (AtomExpression atomExpression : exp.getAtomExpressionList()) {
-                    if (atomExpression.getIdentifier() != null && variableMap.containsKey(atomExpression.getIdentifier())) {
-                        tmpResult.add(Integer.valueOf(variableMap.get(atomExpression.getIdentifier()).toString()));
-                    } else if (atomExpression.getValue() != null) {
-                        tmpResult.add(atomExpression.getValue());
+        for (MultiplyExpression m : multiplyExpressionList) {
+            List<String> valuesQueue = new ArrayList<>();
+            List<MultiplicationOperator> operatorsQueue = new ArrayList<>();
+            // get values from atom expressions and push them on valuesQueue
+            for (AtomExpression ae : m.getAtomExpressionList()) {
+                if (ae.getIdentifier() != null) {
+                    if (variableMap.containsKey(ae.getIdentifier())) {
+                        valuesQueue.add(variableMap.get(ae.getIdentifier()).toString());
                     } else {
-                        throw new IllegalStateException(atomExpression.getIdentifier());
+                        throw new IllegalStateException(ae.getIdentifier());
                     }
+                } else if (ae.getValue() != null) {
+                    valuesQueue.add(ae.getValue().toString());
                 }
-                int v = 1;
-                if (tmpResult.size() > 1) {
-                    for (int i = 0; i < tmpResult.size(); i++) {
-                        int j = i;
-                        if (exp.getOperatorList().get(j) != null) {
-                            switch (exp.getOperatorList().get(j)) {
-                                case DIVIDE:
-                                    v = tmpResult.get(i) / tmpResult.get(i + 1);
-                                    break;
-                                case MULTIPLY:
-                                    v = tmpResult.get(i) * tmpResult.get(i + 1);
-                                    break;
-                            }
-                        }
-                    }
-                } else {
-                    resultList.add(tmpResult.get(0));
-                }
-            } else {
-                throw new IllegalStateException("not valid multiply expression list");
             }
+
+            // get operators and push them on operators queue
+            operatorsQueue.addAll(m.getOperatorList());
+
+            // compute them and set value for given multiply expression
+            if (valuesQueue.size() > 1) {
+                System.out.println("new value");
+                while (valuesQueue.size() > 1) {
+                    Integer val1, val2;
+                    try {
+                        val1 = Integer.valueOf(valuesQueue.get(0));
+                        valuesQueue.remove(0);
+                        val2 = Integer.valueOf(valuesQueue.get(0));
+                        valuesQueue.remove(0);
+                    } catch (NumberFormatException e) {
+                        // e.printStackTrace();
+                        throw new IllegalStateException("Bad arithmetic expression (not a valid number)");
+                    }
+                    MultiplicationOperator operator = operatorsQueue.get(0);
+                    operatorsQueue.remove(0);
+                    Integer result;
+                    System.out.println("values " + val1 + ", " + val2 + ", operator: " + operator);
+                    switch (operator) {
+                        case MULTIPLY:
+                            result = val1 * val2;
+                            break;
+                        case DIVIDE:
+                            result = val1 / val2;
+                            break;
+                        default:
+                            result = 0;
+                            break;
+                    }
+
+                    System.out.println("stack size 1 " + valuesQueue.size() + ", pushing " + result);
+                    valuesQueue.add(0, result.toString());
+                    System.out.println("stack size 2 " + valuesQueue.size());
+                }
+            } else if (valuesQueue.size() == 0) {
+                throw new IllegalStateException("Bad arithmetic expression (1)");
+            }
+
+            if (valuesQueue.size() == 1) {
+                System.out.println("VAL = " + valuesQueue.get(0));
+                m.setValue(valuesQueue.get(0));
+            } else {
+                System.out.println(valuesQueue.size());
+                throw new IllegalStateException("Bad arithmetic expression (2)");
+            }
+            values.add(m.getValue());
         }
-        return "";
+
+        if (values.size() > 1) {
+            while (values.size() > 1) {
+                Integer val1, val2;
+                try {
+                    val1 = Integer.valueOf(values.get(0));
+                    values.remove(0);
+                    val2 = Integer.valueOf(values.get(0));
+                    values.remove(0);
+                } catch (NumberFormatException e) {
+                    // e.printStackTrace();
+                    throw new IllegalStateException("Bad arithmetic expression (not a valid number)");
+                }
+                AdditionOperator operator = operators.get(0);
+                operators.remove(0);
+                Integer result;
+                System.out.println("values " + val1 + ", " + val2 + ", operator: " + operator);
+                switch (operator) {
+                    case ADD:
+                        result = val1 + val2;
+                        break;
+                    case REMOVE:
+                        result = val1 - val2;
+                        break;
+                    default:
+                        result = 0;
+                        break;
+                }
+
+                System.out.println("value = " + result);
+                values.add(0, result.toString());
+            }
+        } else if (values.size() == 0) {
+            throw new IllegalStateException("Bad arithmetic expression (3)");
+        }
+
+        if (values.size() == 1) {
+            return values.get(0);
+        } else {
+            throw new IllegalStateException("Bad arithmetic expression (4)");
+        }
     }
 }

@@ -282,7 +282,7 @@ public class ParserImpl implements Parser {
                 .stream()
                 .map(o -> AdditionOperator.fromString(o.getText()))
                 .collect(Collectors.toList());
-        return new ArithmeticOperation(multiplyExpressionList, additionOperatorList);
+        return new ArithmeticOperation(multiplyExpressionList, additionOperatorList, "0");
     }
 
     private static ObjectProperties objectPropertiesVisitor(AsistParser.ObjectPropertiesContext ctx) {
