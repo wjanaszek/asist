@@ -393,7 +393,6 @@ public class AsistDemo {
                     MultiplicationOperator operator = operatorsQueue.get(0);
                     operatorsQueue.remove(0);
                     Integer result;
-                    System.out.println("values " + val1 + ", " + val2 + ", operator: " + operator);
                     switch (operator) {
                         case MULTIPLY:
                             result = val1 * val2;
@@ -406,19 +405,15 @@ public class AsistDemo {
                             break;
                     }
 
-                    System.out.println("stack size 1 " + valuesQueue.size() + ", pushing " + result);
                     valuesQueue.add(0, result.toString());
-                    System.out.println("stack size 2 " + valuesQueue.size());
                 }
             } else if (valuesQueue.size() == 0) {
                 throw new IllegalStateException("Bad arithmetic expression (1)");
             }
 
             if (valuesQueue.size() == 1) {
-                System.out.println("VAL = " + valuesQueue.get(0));
                 m.setValue(valuesQueue.get(0));
             } else {
-                System.out.println(valuesQueue.size());
                 throw new IllegalStateException("Bad arithmetic expression (2)");
             }
             values.add(m.getValue());
@@ -439,7 +434,6 @@ public class AsistDemo {
                 AdditionOperator operator = operators.get(0);
                 operators.remove(0);
                 Integer result;
-                System.out.println("values " + val1 + ", " + val2 + ", operator: " + operator);
                 switch (operator) {
                     case ADD:
                         result = val1 + val2;
@@ -452,7 +446,6 @@ public class AsistDemo {
                         break;
                 }
 
-                System.out.println("value = " + result);
                 values.add(0, result.toString());
             }
         } else if (values.size() == 0) {
@@ -460,6 +453,7 @@ public class AsistDemo {
         }
 
         if (values.size() == 1) {
+            System.out.println(values.get(0));
             return values.get(0);
         } else {
             throw new IllegalStateException("Bad arithmetic expression (4)");
