@@ -27,6 +27,12 @@ public class BaseTask {
     @Override
     public String toString() {
         String result = "title: " + title + ", message: " + message + ", active: " + active;
+        if (period != null) {
+            result += ", type: EVERY (cyclic)";
+        }
+        if (delay != null) {
+            result += ", type: IN (after some delay)";
+        }
         if (seconds != null) {
             result += ", seconds: " + seconds / 1000;
         } else if (minutes != null) {

@@ -2,6 +2,7 @@ package pl.edu.pw.elka.wjanaszek.asist.domain.task;
 
 import lombok.Getter;
 import lombok.Setter;
+import pl.edu.pw.elka.wjanaszek.asist.utils.StringUtil;
 
 import java.awt.*;
 import java.net.MalformedURLException;
@@ -57,7 +58,7 @@ public class NotificationTask extends BaseTask {
 
     public NotificationTask(Boolean active, String message, String title) {
         this.active = active;
-        this.message = message;
+        this.message = StringUtil.removeQuotesAndDoubleQuotes(message);
         this.title = title;
         this.timer = new Timer(title);
     }

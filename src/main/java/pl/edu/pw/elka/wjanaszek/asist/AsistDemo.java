@@ -9,6 +9,7 @@ import pl.edu.pw.elka.wjanaszek.asist.domain.task.BaseTask;
 import pl.edu.pw.elka.wjanaszek.asist.domain.task.NotificationTask;
 import pl.edu.pw.elka.wjanaszek.asist.domain.variable.VariableOrAssignment;
 import pl.edu.pw.elka.wjanaszek.asist.parser.ParserImpl;
+import pl.edu.pw.elka.wjanaszek.asist.utils.StringUtil;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -45,7 +46,7 @@ public class AsistDemo {
                 } catch (IllegalStateException e) {
                     if (e.getMessage().equals("unknown")) {
                         System.err.println("Unknown error occured");
-                    } else if (e.getMessage().startsWith("Duplicated id")) {
+                    } else if (e.getMessage().startsWith("Duplicate id")) {
                         System.err.println(e.getMessage());
                     } else {
                         System.err.println("No element " + e.getMessage() + " found");
@@ -106,8 +107,7 @@ public class AsistDemo {
                                 throw new IllegalStateException(s);
                             }
                         } else {
-                            s = s.replace("\'", "");
-                            s = s.replace("\"", "");
+                            s = StringUtil.removeQuotesAndDoubleQuotes(s);
                             return s;
                         }
                     })
@@ -137,8 +137,12 @@ public class AsistDemo {
         } else if (statement.getIdentifier().toLowerCase().equals("delete")) {
             if (statement.getParams() != null && statement.getParams().size() > 0 && statement.getParams().get(0).equals("all")) {
                 notificationMap = new HashMap<>();
-            } else if (statement.getParams() != null)
-                notificationMap.entrySet().removeIf(n -> n.getKey().equals(statement.getParams().get(0)));
+            } else if (statement.getParams() != null && statement.getParams().size() > 0) {
+                final String key = StringUtil.removeQuotesAndDoubleQuotes(statement.getParams().get(0));
+                notificationMap.entrySet().removeIf(n -> n.getKey().equals(key));
+            } else {
+                throw new IllegalStateException("Bad entry for delete function");
+            }
         } else {
             // @TODO do something package depended
         }
@@ -147,10 +151,10 @@ public class AsistDemo {
 
     private static void notification(NotificationStatement statement) throws IllegalStateException {
         if (statement.getActionType().toLowerCase().equals("os_notification")) {
-            System.out.println("task to dispatch: " + statement.toString());
             if (notificationMap.containsKey(statement.getIdentifier())) {
                 throw new IllegalStateException("Duplicate id " + statement.getIdentifier());
             }
+            System.out.println("task to dispatch: " + statement.toString());
             NotificationTask task = new NotificationTask(
                     false,
                     statement.getMessage(),
@@ -255,8 +259,7 @@ public class AsistDemo {
             value = notificationMap.keySet().stream()
                     .map(n -> {
                         String param = statement.getParam();
-                        param = param.replace("\"", "");
-                        param = param.replace("\'", "");
+                        param = StringUtil.removeQuotesAndDoubleQuotes(param);
                         if (n.equals(param)) {
                             System.out.println("ID = " + n + ", " + notificationMap.get(n).toString());
                         }
@@ -382,5 +385,4 @@ public class AsistDemo {
 //            hours = timeBased.getSingleTimeType() == SingleTimeType.HOUR ? timeBased.getValue()*60*60*1000 : null;
 //        }
     }
-
 }
