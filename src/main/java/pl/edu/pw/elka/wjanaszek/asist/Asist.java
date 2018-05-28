@@ -165,7 +165,7 @@ public class Asist {
 
     private static Object functionCall(FunctionCall statement) throws IllegalStateException {
         Object o = null;
-        if (statement.getIdentifier().equals("print")) {
+        if (statement != null && statement.getIdentifier() != null && statement.getIdentifier().equals("print")) {
             String message = statement.getParams().stream()
                     .map(s -> {
                         // resolve variable value
@@ -181,7 +181,7 @@ public class Asist {
                     })
                     .collect(Collectors.joining(""));
             System.out.println(message);
-        } else if (statement.getIdentifier().toLowerCase().equals("turn_off")) {
+        } else if (statement != null && statement.getIdentifier() != null && statement.getIdentifier().equals("turn_off")) {
             if (statement.getParams() != null && statement.getParams().size() > 0 && statement.getParams().get(0).equals("all")) {
                 toggleAllNotifications();
             } else if (statement.getParams() != null) {
@@ -192,7 +192,7 @@ public class Asist {
                             task.toggleNotification();
                         });
             }
-        } else if (statement.getIdentifier().toLowerCase().equals("turn_on")) {
+        } else if (statement != null && statement.getIdentifier() != null && statement.getIdentifier().equals("turn_on")) {
             if (statement.getParams() != null && statement.getParams().size() > 0 && statement.getParams().get(0).equals("all")) {
                 toggleAllNotifications();
             } else if (statement.getParams() != null)
@@ -202,7 +202,7 @@ public class Asist {
                             BaseTask task = notificationMap.get(k);
                             task.toggleNotification();
                         });
-        } else if (statement.getIdentifier().toLowerCase().equals("delete")) {
+        } else if (statement != null && statement.getIdentifier() != null && statement.getIdentifier().equals("delete")) {
             if (statement.getParams() != null && statement.getParams().size() > 0 && statement.getParams().get(0).equals("all")) {
                 notificationMap = new HashMap<>();
             } else if (statement.getParams() != null && statement.getParams().size() > 0) {
@@ -212,9 +212,9 @@ public class Asist {
                 throw new IllegalStateException("Bad entry for delete function");
             }
         } else {
-            if (statement.getIdentifier() != null && packageMap.containsKey(statement.getIdentifier())) {
+            if (statement != null && statement.getIdentifier() != null && packageMap.containsKey(statement.getIdentifier())) {
                 // @TODO do something package depended
-            } else if (statement.getIdentifier() != null && !packageMap.containsKey(statement.getIdentifier())) {
+            } else if (statement != null && statement.getIdentifier() != null && !packageMap.containsKey(statement.getIdentifier())) {
                 throw new IllegalStateException(statement.getIdentifier());
             } else {
                 throw new IllegalStateException("Bad function call entry");
@@ -268,11 +268,11 @@ public class Asist {
     }
 
     private static void notification(NotificationStatement statement) throws IllegalStateException {
-        if (statement.getActionType().toLowerCase().equals("os_notification")) {
+        if (statement != null && statement.getActionType() != null && statement.getActionType().equals("os_notification")) {
             if (notificationMap.containsKey(statement.getIdentifier())) {
                 throw new IllegalStateException("Duplicate id " + statement.getIdentifier());
             }
-            System.out.println("task to dispatch: " + statement.toString());
+            // System.out.println("task to dispatch: " + statement.toString());
             NotificationTask task = new NotificationTask(
                     false,
                     statement.getMessage(),
@@ -337,13 +337,15 @@ public class Asist {
             }
             notificationMap.put(statement.getIdentifier(), task);
             notificationMap.get(statement.getIdentifier()).toggleNotification();
-        } else {
-            String type = statement.getActionType().toLowerCase();
+        } else if (statement != null && statement.getActionType() != null){
+            String type = statement.getActionType();
             if (packageMap.containsKey(type)) {
                 // @TODO do something package-depended
             } else {
                 throw new IllegalStateException(type);
             }
+        } else {
+            throw new IllegalStateException("Bad entry for notification statement");
         }
     }
 
