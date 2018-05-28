@@ -1,3 +1,10 @@
-print->('Hello word')
-notify test every 1 minute 'test message' with os_notification
-notify test2 every 10 seconds 'test message 2' with os_notification
+a = 5
+b = 5 * 2 + 3 * 3 * a - 2
+print->(b)
+b = 5 : 2 + a
+print->(b)
+b = 0 - 5 + 2
+print->(b)
+// print->('Hello word')
+// notify test every 1 minute 'test message' with os_notification
+// notify test2 every 10 seconds 'test message 2' with os_notification

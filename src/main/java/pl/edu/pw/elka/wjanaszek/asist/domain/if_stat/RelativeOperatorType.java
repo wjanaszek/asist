@@ -22,6 +22,6 @@ public enum RelativeOperatorType {
                 return s;
             }
         }
-        throw new IllegalArgumentException(text + " is invalid header name");
+        throw new IllegalStateException("Bad - " + text + " is invalid header name");
     }
 }

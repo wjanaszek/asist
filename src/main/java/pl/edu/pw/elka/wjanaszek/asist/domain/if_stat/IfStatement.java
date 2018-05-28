@@ -17,17 +17,17 @@ import java.util.List;
 @EqualsAndHashCode
 public class IfStatement extends Statement {
     private ConditionExpression conditionExpression;
-    private List<Instruction> iFInstructionList;
+    private List<Instruction> ifInstructionList;
     private List<Instruction> elseInstructionList;
 
     public IfStatement() {
         super(StatementType.IF_STATEMENT);
     }
 
-    public IfStatement(ConditionExpression conditionExpression, List<Instruction> iFInstructionList, List<Instruction> elseInstructionList) {
+    public IfStatement(ConditionExpression conditionExpression, List<Instruction> ifInstructionList, List<Instruction> elseInstructionList) {
         super(StatementType.IF_STATEMENT);
         this.conditionExpression = conditionExpression;
-        this.iFInstructionList = iFInstructionList;
+        this.ifInstructionList = ifInstructionList;
         this.elseInstructionList = elseInstructionList;
     }
 }
