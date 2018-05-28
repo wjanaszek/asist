@@ -76,15 +76,17 @@ public class ParserImpl implements Parser {
     private static class ImportStatementVisitor extends AsistBaseVisitor<ImportStatement> {
 
         public ImportStatement visitImportStatement(AsistParser.ImportStatementContext ctx) {
-            String packageName = ctx.IDENTIFIER().getText();
-            return new ImportStatement(packageName);
+            return ctx.IDENTIFIER() != null ? new ImportStatement(ctx.IDENTIFIER().getText()) : null;
         }
     }
 
     private static class NotificationStatementVisitor extends AsistBaseVisitor<NotificationStatement> {
 
         public NotificationStatement visitNotificationStatement(AsistParser.NotificationStatementContext ctx) {
-            String identifier = ctx.IDENTIFIER().getText();
+            String identifier = ctx.IDENTIFIER() != null ? ctx.IDENTIFIER().getText() : null;
+            if (identifier == null) {
+                return null;
+            }
             TimeBased timeBased = new TimeBased();
             TimePrecisely timePrecisely = new TimePrecisely();
             OnEvent onEvent = new OnEvent();
@@ -133,8 +135,8 @@ public class ParserImpl implements Parser {
                         .collect(Collectors.toList()));
             }
             FiredWhen firedWhen = new FiredWhen(timeBased, timePrecisely, onEvent);
-            String message = ctx.STRING().getText();
-            String actionType = ctx.actionType().getText();
+            String message = ctx.STRING() != null ? ctx.STRING().getText() : null;
+            String actionType = ctx.actionType() != null ? ctx.actionType().getText() : null;
             return new NotificationStatement(identifier, firedWhen, message, actionType);
         }
     }
@@ -179,7 +181,10 @@ public class ParserImpl implements Parser {
     private static class FunctionCallVisitor extends AsistBaseVisitor<FunctionCall> {
 
         public FunctionCall visitFunctionCall(AsistParser.FunctionCallContext ctx) {
-            String identifier = ctx.IDENTIFIER().getText();
+            String identifier = ctx.IDENTIFIER() != null ? ctx.IDENTIFIER().getText() : null;
+            if (identifier == null) {
+                return null;
+            }
             List<String> params = new ArrayList<>();
             if (ctx.params() != null) {
                 params = ctx.params().children

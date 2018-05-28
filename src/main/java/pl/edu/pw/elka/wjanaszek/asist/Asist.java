@@ -83,7 +83,6 @@ public class Asist {
 
             // compute them and set value for given multiply expression
             if (valuesQueue.size() > 1) {
-                System.out.println("new value");
                 while (valuesQueue.size() > 1) {
                     Integer val1, val2;
                     try {
@@ -158,7 +157,6 @@ public class Asist {
         }
 
         if (values.size() == 1) {
-            System.out.println(values.get(0));
             return values.get(0);
         } else {
             throw new IllegalStateException("Bad arithmetic expression (4)");
