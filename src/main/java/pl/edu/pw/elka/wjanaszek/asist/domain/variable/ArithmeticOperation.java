@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ArithmeticOperation {
-    List<MultiplyExpression> multiplyExpressionList;
-    List<AdditionOperator> operatorList;
+    private List<MultiplyExpression> multiplyExpressionList;
+    private List<AdditionOperator> operatorList;
+    private String value;
 }

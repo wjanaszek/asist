@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MultiplyExpression {
-    List<AtomExpression> atomExpressionList;
-    List<MultiplicationOperator> operatorList;
+    private List<AtomExpression> atomExpressionList;
+    private List<MultiplicationOperator> operatorList;
+    private String value;
 }

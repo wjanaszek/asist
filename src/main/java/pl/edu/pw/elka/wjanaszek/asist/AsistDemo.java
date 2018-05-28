@@ -7,9 +7,10 @@ import pl.edu.pw.elka.wjanaszek.asist.domain.notification.*;
 import pl.edu.pw.elka.wjanaszek.asist.domain.search.SearchFunction;
 import pl.edu.pw.elka.wjanaszek.asist.domain.task.BaseTask;
 import pl.edu.pw.elka.wjanaszek.asist.domain.task.NotificationTask;
-import pl.edu.pw.elka.wjanaszek.asist.domain.variable.VariableOrAssignment;
+import pl.edu.pw.elka.wjanaszek.asist.domain.variable.*;
 import pl.edu.pw.elka.wjanaszek.asist.parser.ParserImpl;
 import pl.edu.pw.elka.wjanaszek.asist.utils.StringUtil;
+import pl.edu.pw.elka.wjanaszek.asist.utils.TimeBasedValues;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -34,7 +35,7 @@ public class AsistDemo {
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (IllegalStateException e) {
-                System.err.println("No element " + e.getMessage() + " found");
+                handleIllegalStateException(e);
             }
         } else if (args.length == 0) {
             Scanner scanner = new Scanner(System.in);
@@ -44,13 +45,7 @@ public class AsistDemo {
                 try {
                     serveSource(source);
                 } catch (IllegalStateException e) {
-                    if (e.getMessage().equals("unknown")) {
-                        System.err.println("Unknown error occured");
-                    } else if (e.getMessage().startsWith("Duplicate id")) {
-                        System.err.println(e.getMessage());
-                    } else {
-                        System.err.println("No element " + e.getMessage() + " found");
-                    }
+                    handleIllegalStateException(e);
                 }
             }
         } else {
@@ -59,7 +54,7 @@ public class AsistDemo {
     }
 
     private static void serveSource(String source) throws IllegalStateException {
-        Script script = null;
+        Script script;
         try {
             script = new ParserImpl().parse(source);
         } catch (NullPointerException e) {
@@ -144,7 +139,13 @@ public class AsistDemo {
                 throw new IllegalStateException("Bad entry for delete function");
             }
         } else {
-            // @TODO do something package depended
+            if (statement.getIdentifier() != null && packageMap.containsKey(statement.getIdentifier())) {
+                // do something package depended
+            } else if (statement.getIdentifier() != null && !packageMap.containsKey(statement.getIdentifier())) {
+                throw new IllegalStateException(statement.getIdentifier());
+            } else {
+                throw new IllegalStateException("Bad function call entry");
+            }
         }
         return o;
     }
@@ -161,49 +162,31 @@ public class AsistDemo {
                     statement.getIdentifier()
             );
             if (statement.getFiredWhen().getTimeBased().getType() != null) {
-                Integer seconds = null;
-                Integer minutes = null;
-                Integer hours = null;
                 TimeBased timeBased = statement.getFiredWhen().getTimeBased();
+                TimeBasedValues timeBasedValues;
                 if (statement.getFiredWhen().getTimeBased().getType() == TimeBasedType.IN) {
-                    if (timeBased.getPluralTimeType() != null) {
-                        seconds = timeBased.getPluralTimeType() == PluralTimeType.SECONDS ? timeBased.getValue() * 1000 : null;
-                        minutes = timeBased.getPluralTimeType() == PluralTimeType.MINUTES ? timeBased.getValue() * 60 * 1000 : null;
-                        hours = timeBased.getPluralTimeType() == PluralTimeType.HOURS ? timeBased.getValue() * 60 * 60 * 1000 : null;
-                    } else if (timeBased.getSingleTimeType() != null) {
-                        seconds = timeBased.getSingleTimeType() == SingleTimeType.SECOND ? timeBased.getValue() * 1000 : null;
-                        minutes = timeBased.getSingleTimeType() == SingleTimeType.MINUTE ? timeBased.getValue() * 60 * 1000 : null;
-                        hours = timeBased.getSingleTimeType() == SingleTimeType.HOUR ? timeBased.getValue() * 60 * 60 * 1000 : null;
-                    }
-                    if (seconds != null) {
-                        task.setDelay(seconds);
-                        task.setSeconds(seconds);
-                    } else if (minutes != null) {
-                        task.setDelay(minutes);
-                        task.setMinutes(minutes);
-                    } else if (hours != null) {
-                        task.setDelay(hours);
-                        task.setHours(hours);
+                    timeBasedValues = getTimeBasedValues(timeBased);
+                    if (timeBasedValues.getSeconds() != null) {
+                        task.setDelay(timeBasedValues.getSeconds());
+                        task.setSeconds(timeBasedValues.getSeconds());
+                    } else if (timeBasedValues.getMinutes() != null) {
+                        task.setDelay(timeBasedValues.getMinutes());
+                        task.setMinutes(timeBasedValues.getMinutes());
+                    } else if (timeBasedValues.getHours() != null) {
+                        task.setDelay(timeBasedValues.getHours());
+                        task.setHours(timeBasedValues.getHours());
                     }
                 } else if (statement.getFiredWhen().getTimeBased().getType() == TimeBasedType.EVERY) {
-                    if (timeBased.getPluralTimeType() != null) {
-                        seconds = timeBased.getPluralTimeType() == PluralTimeType.SECONDS ? timeBased.getValue() * 1000 : null;
-                        minutes = timeBased.getPluralTimeType() == PluralTimeType.MINUTES ? timeBased.getValue() * 60 * 1000 : null;
-                        hours = timeBased.getPluralTimeType() == PluralTimeType.HOURS ? timeBased.getValue() * 60 * 60 * 1000 : null;
-                    } else if (timeBased.getSingleTimeType() != null) {
-                        seconds = timeBased.getSingleTimeType() == SingleTimeType.SECOND ? timeBased.getValue() * 1000 : null;
-                        minutes = timeBased.getSingleTimeType() == SingleTimeType.MINUTE ? timeBased.getValue() * 60 * 1000 : null;
-                        hours = timeBased.getSingleTimeType() == SingleTimeType.HOUR ? timeBased.getValue() * 60 * 60 * 1000 : null;
-                    }
-                    if (seconds != null) {
-                        task.setPeriod(seconds);
-                        task.setSeconds(seconds);
-                    } else if (minutes != null) {
-                        task.setPeriod(minutes);
-                        task.setMinutes(minutes);
-                    } else if (hours != null) {
-                        task.setPeriod(hours);
-                        task.setHours(hours);
+                    timeBasedValues = getTimeBasedValues(timeBased);
+                    if (timeBasedValues.getSeconds() != null) {
+                        task.setPeriod(timeBasedValues.getSeconds());
+                        task.setSeconds(timeBasedValues.getSeconds());
+                    } else if (timeBasedValues.getMinutes() != null) {
+                        task.setPeriod(timeBasedValues.getMinutes());
+                        task.setMinutes(timeBasedValues.getMinutes());
+                    } else if (timeBasedValues.getHours() != null) {
+                        task.setPeriod(timeBasedValues.getHours());
+                        task.setHours(timeBasedValues.getHours());
                     }
                 }
             } else if (statement.getFiredWhen().getTimePrecisely().getTime() != null) {
@@ -321,48 +304,12 @@ public class AsistDemo {
                 // then check if it's from some package
             } else {
                 // else throw exception
-                throw new IllegalStateException("unknown");
+                throw new IllegalStateException(propertiesList
+                        .stream()
+                        .collect(Collectors.joining(", ")));
             }
         } else if (statement.getArithmeticOperation() != null) {
-//            ArithmeticOperation a = statement.getArithmeticOperation();
-//            List<MultiplyExpression> multiplyExpressionList = a.getMultiplyExpressionList();
-//            List<AdditionOperator> additionOperatorList = a.getOperatorList();
-//
-//            for (MultiplyExpression exp : multiplyExpressionList) {
-//                List<Integer> resultList = new ArrayList<>();
-//                if (exp.getAtomExpressionList().size() == exp.getOperatorList().size() + 1) {
-//                    List<Integer> tmpResult = new ArrayList<>();
-//                    for (AtomExpression atomExpression : exp.getAtomExpressionList()) {
-//                        if (atomExpression.getIdentifier() != null && variableMap.containsKey(atomExpression.getIdentifier())) {
-//                            tmpResult.add(Integer.valueOf(variableMap.get(atomExpression.getIdentifier()).toString()));
-//                        } else if (atomExpression.getValue() != null) {
-//                            tmpResult.add(atomExpression.getValue());
-//                        } else {
-//                            throw new IllegalStateException(atomExpression.getIdentifier());
-//                        }
-//                    }
-//                    int v = 1;
-//                    if (tmpResult.size() > 1) {
-//                        for (int i = 0; i < tmpResult.size(); i++) {
-//                            int j = i;
-//                            if (exp.getOperatorList().get(j) != null) {
-//                                switch (exp.getOperatorList().get(j)) {
-//                                    case DIVIDE:
-//                                        v = tmpResult.get(i) / tmpResult.get(i + 1);
-//                                        break;
-//                                    case MULTIPLY:
-//                                        v = tmpResult.get(i) * tmpResult.get(i + 1);
-//                                        break;
-//                                }
-//                            }
-//                        }
-//                    } else {
-//                        resultList.add(tmpResult.get(0));
-//                    }
-//                } else {
-//                    throw new IllegalStateException("not valid multiply expression list");
-//                }
-//            }
+            value = arithmeticOperation(statement.getArithmeticOperation());
         }
         variableMap.put(identifier, value);
     }
@@ -374,15 +321,75 @@ public class AsistDemo {
         });
     }
 
-    private static void timeBasedValues(TimeBased timeBased, Integer seconds, Integer minutes, Integer hours) {
-//        if (timeBased.getPluralTimeType() != null) {
-//            seconds = timeBased.getPluralTimeType() == PluralTimeType.SECONDS ? timeBased.getValue()*1000 : null;
-//            minutes = timeBased.getPluralTimeType() == PluralTimeType.MINUTES ? timeBased.getValue()*60*1000 : null;
-//            hours = timeBased.getPluralTimeType() == PluralTimeType.HOURS ? timeBased.getValue()*60*60*1000 : null;
-//        } else if (timeBased.getSingleTimeType() != null) {
-//            seconds = timeBased.getSingleTimeType() == SingleTimeType.SECOND ? timeBased.getValue()*1000 : null;
-//            minutes = timeBased.getSingleTimeType() == SingleTimeType.MINUTE ? timeBased.getValue()*60*1000 : null;
-//            hours = timeBased.getSingleTimeType() == SingleTimeType.HOUR ? timeBased.getValue()*60*60*1000 : null;
-//        }
+    private static TimeBasedValues getTimeBasedValues(TimeBased timeBased) {
+        TimeBasedValues timeBasedValues = new TimeBasedValues();
+        Integer seconds = null, minutes = null, hours = null;
+        if (timeBased.getPluralTimeType() != null) {
+            seconds = timeBased.getPluralTimeType() == PluralTimeType.SECONDS ? timeBased.getValue()*1000 : null;
+            minutes = timeBased.getPluralTimeType() == PluralTimeType.MINUTES ? timeBased.getValue()*60*1000 : null;
+            hours = timeBased.getPluralTimeType() == PluralTimeType.HOURS ? timeBased.getValue()*60*60*1000 : null;
+        } else if (timeBased.getSingleTimeType() != null) {
+            seconds = timeBased.getSingleTimeType() == SingleTimeType.SECOND ? timeBased.getValue()*1000 : null;
+            minutes = timeBased.getSingleTimeType() == SingleTimeType.MINUTE ? timeBased.getValue()*60*1000 : null;
+            hours = timeBased.getSingleTimeType() == SingleTimeType.HOUR ? timeBased.getValue()*60*60*1000 : null;
+        }
+        timeBasedValues.setSeconds(seconds);
+        timeBasedValues.setMinutes(minutes);
+        timeBasedValues.setHours(hours);
+        return timeBasedValues;
+    }
+
+    private static void handleIllegalStateException(IllegalStateException e) {
+        if (e.getMessage().equals("unknown")) {
+            System.err.println("Unknown error occured");
+        } else if (e.getMessage().startsWith("Duplicate id")) {
+            System.err.println(e.getMessage());
+        } else if (e.getMessage().startsWith("Bad")) {
+            System.err.println(e.getMessage());
+        } else {
+            System.err.println("No element " + e.getMessage() + " found");
+        }
+    }
+
+    private static String arithmeticOperation(ArithmeticOperation a) {
+        List<MultiplyExpression> multiplyExpressionList = a.getMultiplyExpressionList();
+        List<AdditionOperator> additionOperatorList = a.getOperatorList();
+
+        for (MultiplyExpression exp : multiplyExpressionList) {
+            List<Integer> resultList = new ArrayList<>();
+            if (exp.getAtomExpressionList().size() == exp.getOperatorList().size() + 1) {
+                List<Integer> tmpResult = new ArrayList<>();
+                for (AtomExpression atomExpression : exp.getAtomExpressionList()) {
+                    if (atomExpression.getIdentifier() != null && variableMap.containsKey(atomExpression.getIdentifier())) {
+                        tmpResult.add(Integer.valueOf(variableMap.get(atomExpression.getIdentifier()).toString()));
+                    } else if (atomExpression.getValue() != null) {
+                        tmpResult.add(atomExpression.getValue());
+                    } else {
+                        throw new IllegalStateException(atomExpression.getIdentifier());
+                    }
+                }
+                int v = 1;
+                if (tmpResult.size() > 1) {
+                    for (int i = 0; i < tmpResult.size(); i++) {
+                        int j = i;
+                        if (exp.getOperatorList().get(j) != null) {
+                            switch (exp.getOperatorList().get(j)) {
+                                case DIVIDE:
+                                    v = tmpResult.get(i) / tmpResult.get(i + 1);
+                                    break;
+                                case MULTIPLY:
+                                    v = tmpResult.get(i) * tmpResult.get(i + 1);
+                                    break;
+                            }
+                        }
+                    }
+                } else {
+                    resultList.add(tmpResult.get(0));
+                }
+            } else {
+                throw new IllegalStateException("not valid multiply expression list");
+            }
+        }
+        return "";
     }
 }
