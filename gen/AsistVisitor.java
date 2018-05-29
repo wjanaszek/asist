@@ -214,12 +214,6 @@ public interface AsistVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIfStatement(AsistParser.IfStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link AsistParser#conditionExpression}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitConditionExpression(AsistParser.ConditionExpressionContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link AsistParser#ifInstructions}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -238,11 +232,11 @@ public interface AsistVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitInstruction(AsistParser.InstructionContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link AsistParser#simpleExpression}.
+	 * Visit a parse tree produced by {@link AsistParser#conditionExpression}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitSimpleExpression(AsistParser.SimpleExpressionContext ctx);
+	T visitConditionExpression(AsistParser.ConditionExpressionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link AsistParser#term}.
 	 * @param ctx the parse tree
@@ -255,4 +249,70 @@ public interface AsistVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitFactor(AsistParser.FactorContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AsistParser#relativeFactor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRelativeFactor(AsistParser.RelativeFactorContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AsistParser#relativeArithmeticArithmetic}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRelativeArithmeticArithmetic(AsistParser.RelativeArithmeticArithmeticContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AsistParser#relativeVariableVariable}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRelativeVariableVariable(AsistParser.RelativeVariableVariableContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AsistParser#relativeIntegerInteger}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRelativeIntegerInteger(AsistParser.RelativeIntegerIntegerContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AsistParser#relativeArithmeticInteger}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRelativeArithmeticInteger(AsistParser.RelativeArithmeticIntegerContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AsistParser#relativeArithmeticVariable}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRelativeArithmeticVariable(AsistParser.RelativeArithmeticVariableContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AsistParser#relativeVariableArithmetic}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRelativeVariableArithmetic(AsistParser.RelativeVariableArithmeticContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AsistParser#relativeVariableInteger}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRelativeVariableInteger(AsistParser.RelativeVariableIntegerContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AsistParser#relativeIntegerVariable}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRelativeIntegerVariable(AsistParser.RelativeIntegerVariableContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AsistParser#relativeIntegerArithmetic}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRelativeIntegerArithmetic(AsistParser.RelativeIntegerArithmeticContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AsistParser#notVariable}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNotVariable(AsistParser.NotVariableContext ctx);
 }

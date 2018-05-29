@@ -423,18 +423,6 @@ public class AsistBaseListener implements AsistListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterConditionExpression(AsistParser.ConditionExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitConditionExpression(AsistParser.ConditionExpressionContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterIfInstructions(AsistParser.IfInstructionsContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -471,13 +459,13 @@ public class AsistBaseListener implements AsistListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSimpleExpression(AsistParser.SimpleExpressionContext ctx) { }
+	@Override public void enterConditionExpression(AsistParser.ConditionExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitSimpleExpression(AsistParser.SimpleExpressionContext ctx) { }
+	@Override public void exitConditionExpression(AsistParser.ConditionExpressionContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -502,6 +490,138 @@ public class AsistBaseListener implements AsistListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitFactor(AsistParser.FactorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelativeFactor(AsistParser.RelativeFactorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelativeFactor(AsistParser.RelativeFactorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelativeArithmeticArithmetic(AsistParser.RelativeArithmeticArithmeticContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelativeArithmeticArithmetic(AsistParser.RelativeArithmeticArithmeticContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelativeVariableVariable(AsistParser.RelativeVariableVariableContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelativeVariableVariable(AsistParser.RelativeVariableVariableContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelativeIntegerInteger(AsistParser.RelativeIntegerIntegerContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelativeIntegerInteger(AsistParser.RelativeIntegerIntegerContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelativeArithmeticInteger(AsistParser.RelativeArithmeticIntegerContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelativeArithmeticInteger(AsistParser.RelativeArithmeticIntegerContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelativeArithmeticVariable(AsistParser.RelativeArithmeticVariableContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelativeArithmeticVariable(AsistParser.RelativeArithmeticVariableContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelativeVariableArithmetic(AsistParser.RelativeVariableArithmeticContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelativeVariableArithmetic(AsistParser.RelativeVariableArithmeticContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelativeVariableInteger(AsistParser.RelativeVariableIntegerContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelativeVariableInteger(AsistParser.RelativeVariableIntegerContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelativeIntegerVariable(AsistParser.RelativeIntegerVariableContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelativeIntegerVariable(AsistParser.RelativeIntegerVariableContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterRelativeIntegerArithmetic(AsistParser.RelativeIntegerArithmeticContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRelativeIntegerArithmetic(AsistParser.RelativeIntegerArithmeticContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNotVariable(AsistParser.NotVariableContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNotVariable(AsistParser.NotVariableContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

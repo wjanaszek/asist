@@ -202,41 +202,33 @@ public class ParserImpl implements Parser {
             ConditionExpression conditionExpression = new ConditionExpression();
             List<Instruction> ifInstructions = new ArrayList<>();
             List<Instruction> elseInstructions = new ArrayList<>();
-            if (ctx.conditionExpression() != null) {
-                conditionExpression.setSimpleExpressionList(ctx.conditionExpression().simpleExpression()
+            if (ctx.conditionExpression() != null && ctx.conditionExpression().term() != null) {
+                conditionExpression.setTermList(ctx.conditionExpression().term()
                         .stream()
                         .map(i -> {
-                                    SimpleExpression simpleExpression = new SimpleExpression();
-                                    simpleExpression.setTermList(i.term()
-                                            .stream()
-                                            .map(t -> {
-                                                Term term = new Term();
-                                                term.setFactorList(t.factor()
-                                                        .stream()
-                                                        .map(f -> {
-                                                            Factor factor = new Factor();
-                                                            if (f.arithmeticOperation() != null) {
-                                                                factor.setArithmeticOperation(arithmeticOperationVisitor(f.arithmeticOperation()));
-                                                            } else if (f.variable() != null) {
-                                                                factor.setIdentifier(f.variable().getText());
-                                                            } else if (f.INTEGER_NUMBER() != null) {
-                                                                factor.setInteger(Integer.valueOf(f.INTEGER_NUMBER().getText()));
-                                                            } else if (f.objectProperties() != null) {
-                                                                factor.setObjectProperties(objectPropertiesVisitor(f.objectProperties()));
-                                                            }
-                                                            return factor;
-                                                        })
-                                                        .collect(Collectors.toList()));
-                                                return term;
-                                            })
-                                            .collect(Collectors.toList()));
-                                    return simpleExpression;
-                                }
-                        )
-                        .collect(Collectors.toList()));
-                conditionExpression.setRelativeOperatorList(ctx.conditionExpression().RELATIVE_OPERATOR()
-                        .stream()
-                        .map(o -> RelativeOperatorType.fromString(o.getText()))
+                            Term term = new Term();
+                            term.setFactorList(i.factor().stream()
+                                    .map(f -> {
+                                        Factor factor = new Factor();
+                                        if (f.objectProperties() != null) {
+                                            factor.setObjectProperties(objectPropertiesVisitor(f.objectProperties()));
+                                        } else if (f.INTEGER_NUMBER() != null) {
+                                            factor.setInteger(Integer.valueOf(f.INTEGER_NUMBER().getText()));
+                                        } else if (f.variable() != null) {
+                                            factor.setIdentifier(f.variable().getText());
+                                        } else if (f.arithmeticOperation() != null) {
+                                            factor.setArithmeticOperation(arithmeticOperationVisitor(f.arithmeticOperation()));
+                                        } else if (f.notVariable() != null) {
+                                            factor.setNotIdentifier(f.notVariable().variable().getText());
+                                        } else if (f.relativeFactor() != null) {
+                                            RelativeFactor relativeFactor = resolveFactor(f.relativeFactor());
+                                            factor.setRelativeFactor(relativeFactor);
+                                        }
+                                        return factor;
+                                    })
+                                    .collect(Collectors.toList()));
+                            return term;
+                        })
                         .collect(Collectors.toList()));
             }
             if (ctx.ifInstructions() != null) {
@@ -252,6 +244,48 @@ public class ParserImpl implements Parser {
                         .collect(Collectors.toList());
             }
             return new IfStatement(conditionExpression, ifInstructions, elseInstructions);
+        }
+
+        private static RelativeFactor resolveFactor(AsistParser.RelativeFactorContext ctx) {
+            RelativeFactor relativeFactor = new RelativeFactor();
+            if (ctx.relativeArithmeticArithmetic() != null) {
+                relativeFactor.setOperatorType(RelativeOperatorType.fromString(ctx.relativeArithmeticArithmetic().RELATIVE_OPERATOR().getText()));
+                relativeFactor.setLeftArithmetic(arithmeticOperationVisitor(ctx.relativeArithmeticArithmetic().arithmeticOperation(0)));
+                relativeFactor.setRightArithmetic(arithmeticOperationVisitor(ctx.relativeArithmeticArithmetic().arithmeticOperation(1)));
+            } else if (ctx.relativeArithmeticInteger() != null) {
+                relativeFactor.setOperatorType(RelativeOperatorType.fromString(ctx.relativeArithmeticInteger().RELATIVE_OPERATOR().getText()));
+                relativeFactor.setLeftArithmetic(arithmeticOperationVisitor(ctx.relativeArithmeticInteger().arithmeticOperation()));
+                relativeFactor.setRightInteger(Integer.valueOf(ctx.relativeArithmeticInteger().INTEGER_NUMBER().getText()));
+            } else if (ctx.relativeArithmeticVariable() != null) {
+                relativeFactor.setOperatorType(RelativeOperatorType.fromString(ctx.relativeArithmeticVariable().RELATIVE_OPERATOR().getText()));
+                relativeFactor.setLeftArithmetic(arithmeticOperationVisitor(ctx.relativeArithmeticVariable().arithmeticOperation()));
+                relativeFactor.setRightVariable((ctx.relativeArithmeticVariable().variable().getText()));
+            } else if (ctx.relativeIntegerArithmetic() != null) {
+                relativeFactor.setOperatorType(RelativeOperatorType.fromString(ctx.relativeIntegerArithmetic().RELATIVE_OPERATOR().getText()));
+                relativeFactor.setLeftInteger(Integer.valueOf(ctx.relativeIntegerArithmetic().INTEGER_NUMBER().getText()));
+                relativeFactor.setRightArithmetic(arithmeticOperationVisitor(ctx.relativeIntegerArithmetic().arithmeticOperation()));
+            } else if (ctx.relativeIntegerInteger() != null) {
+                relativeFactor.setOperatorType(RelativeOperatorType.fromString(ctx.relativeIntegerInteger().RELATIVE_OPERATOR().getText()));
+                relativeFactor.setLeftInteger(Integer.valueOf(ctx.relativeIntegerInteger().INTEGER_NUMBER(0).getText()));
+                relativeFactor.setRightInteger(Integer.valueOf(ctx.relativeIntegerInteger().INTEGER_NUMBER(1).getText()));
+            } else if (ctx.relativeIntegerVariable() != null) {
+                relativeFactor.setOperatorType(RelativeOperatorType.fromString(ctx.relativeIntegerVariable().RELATIVE_OPERATOR().getText()));
+                relativeFactor.setLeftInteger(Integer.valueOf(ctx.relativeIntegerVariable().INTEGER_NUMBER().getText()));
+                relativeFactor.setRightVariable(ctx.relativeIntegerVariable().variable().getText());
+            } else if (ctx.relativeVariableArithmetic() != null) {
+                relativeFactor.setOperatorType(RelativeOperatorType.fromString(ctx.relativeVariableArithmetic().RELATIVE_OPERATOR().getText()));
+                relativeFactor.setLeftVariable(ctx.relativeVariableArithmetic().variable().getText());
+                relativeFactor.setRightArithmetic(arithmeticOperationVisitor(ctx.relativeVariableArithmetic().arithmeticOperation()));
+            } else if (ctx.relativeVariableVariable() != null) {
+                relativeFactor.setOperatorType(RelativeOperatorType.fromString(ctx.relativeVariableVariable().RELATIVE_OPERATOR().getText()));
+                relativeFactor.setLeftVariable(ctx.relativeVariableVariable().variable(0).getText());
+                relativeFactor.setRightVariable(ctx.relativeVariableVariable().variable(1).getText());
+            } else if (ctx.relativeVariableInteger() != null) {
+                relativeFactor.setOperatorType(RelativeOperatorType.fromString(ctx.relativeVariableInteger().RELATIVE_OPERATOR().getText()));
+                relativeFactor.setLeftVariable(ctx.relativeVariableInteger().variable().getText());
+                relativeFactor.setRightInteger(Integer.valueOf(ctx.relativeVariableInteger().INTEGER_NUMBER().getText()));
+            }
+            return relativeFactor;
         }
     }
 

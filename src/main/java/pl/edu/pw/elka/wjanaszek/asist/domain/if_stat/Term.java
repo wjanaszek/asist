@@ -13,5 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Term {
+    // list of "and" connected factors
     private List<Factor> factorList;
+    private Boolean value;
 }

@@ -1,10 +1,9 @@
 package pl.edu.pw.elka.wjanaszek.asist;
 
+import com.google.gson.Gson;
 import pl.edu.pw.elka.wjanaszek.asist.domain.Script;
 import pl.edu.pw.elka.wjanaszek.asist.domain.function.FunctionCall;
-import pl.edu.pw.elka.wjanaszek.asist.domain.if_stat.ConditionExpression;
-import pl.edu.pw.elka.wjanaszek.asist.domain.if_stat.IfStatement;
-import pl.edu.pw.elka.wjanaszek.asist.domain.if_stat.Instruction;
+import pl.edu.pw.elka.wjanaszek.asist.domain.if_stat.*;
 import pl.edu.pw.elka.wjanaszek.asist.domain.import_stat.ImportStatement;
 import pl.edu.pw.elka.wjanaszek.asist.domain.notification.*;
 import pl.edu.pw.elka.wjanaszek.asist.domain.search.SearchFunction;
@@ -223,6 +222,41 @@ public class Asist {
         return o;
     }
 
+    private static String getObjectProperties(ObjectProperties statement) throws IllegalStateException {
+        List<String> propertiesList = statement.getPropertiesList();
+        String value = "";
+        // first check if it's now object (containing the newest date)
+        if (propertiesList.size() > 0 && propertiesList.get(0).equals("now")) {
+            if (propertiesList.size() > 2) {
+                throw new IllegalStateException("to many properties to object now-date");
+            } else {
+                if (propertiesList.get(1).equals("day")) {
+                    value = new SimpleDateFormat("dd").format(new Date());
+                } else if (propertiesList.get(1).equals("month")) {
+                    value = new SimpleDateFormat("MM").format(new Date());
+                } else if (propertiesList.get(1).equals("year")) {
+                    value = new SimpleDateFormat("yyyy").format(new Date());
+                } else if (propertiesList.get(1).equals("hour")) {
+                    value = new SimpleDateFormat("HH").format(new Date());
+                } else if (propertiesList.get(1).equals("minute")) {
+                    value = new SimpleDateFormat("mm").format(new Date());
+                } else if (propertiesList.get(1).equals("second")) {
+                    value = new SimpleDateFormat("ss").format(new Date());
+                } else {
+                    throw new IllegalStateException(propertiesList.get(1));
+                }
+            }
+        } else if (propertiesList.size() > 0 && packageMap.containsKey(propertiesList.get(0))) {
+            // @TODO then check if it's from some package
+        } else {
+            // else throw exception
+            throw new IllegalStateException(propertiesList
+                    .stream()
+                    .collect(Collectors.joining(", ")));
+        }
+        return value;
+    }
+
     private static TimeBasedValues getTimeBasedValues(TimeBased timeBased) {
         TimeBasedValues timeBasedValues = new TimeBasedValues();
         Integer seconds = null, minutes = null, hours = null;
@@ -245,6 +279,8 @@ public class Asist {
         if (e.getMessage().equals("unknown")) {
             System.err.println("Unknown error occured");
         } else if (e.getMessage().startsWith("Duplicate id")) {
+            System.err.println(e.getMessage());
+        } else if (e.getMessage().startsWith("Not initialized")) {
             System.err.println(e.getMessage());
         } else if (e.getMessage().startsWith("Bad")) {
             System.err.println(e.getMessage());
@@ -355,12 +391,142 @@ public class Asist {
     }
 
     private static Boolean resolveConditionExpression(ConditionExpression expression) {
-        // @TODO implement this
-        return true;
+        List<Boolean> factorValues = new ArrayList<>();
+        expression.getTermList().forEach(t -> {
+            t.getFactorList().forEach(f -> {
+                if (f.getRelativeFactor() != null) {
+                    RelativeFactor relativeFactor = f.getRelativeFactor();
+                    Boolean result = resolveRelativeFactor(relativeFactor);
+                    f.setValue(result);
+                    factorValues.add(result);
+                } else if (f.getInteger() != null) {
+                    Boolean result = f.getInteger() > 0;
+                    f.setValue(result);
+                    factorValues.add(result);
+                } else if (f.getIdentifier() != null) {
+                    Boolean result;
+                    if (variableMap.containsKey(f.getIdentifier())) {
+                        try {
+                            result = Integer.valueOf(variableMap.get(f.getIdentifier()).toString()) > 0;
+                        } catch (NumberFormatException e) {
+                            result = true;
+                        }
+                    } else {
+                        throw new IllegalStateException(f.getIdentifier());
+                    }
+                    f.setValue(result);
+                    factorValues.add(result);
+                } else if (f.getArithmeticOperation() != null) {
+                    Boolean result = Integer.valueOf(arithmeticOperation(f.getArithmeticOperation())) > 0;
+                    f.setValue(result);
+                    factorValues.add(result);
+                } else if (f.getNotIdentifier() != null) {
+                    Boolean result;
+                    if (variableMap.containsKey(f.getIdentifier())) {
+                        try {
+                            result = !(Integer.valueOf(variableMap.get(f.getIdentifier()).toString()) > 0);
+                        } catch (NumberFormatException e) {
+                            result = false;
+                        }
+                    } else {
+                        throw new IllegalStateException(f.getIdentifier());
+                    }
+                    f.setValue(result);
+                    factorValues.add(result);
+                } else if (f.getObjectProperties() != null) {
+                    Boolean result;
+                    String s = getObjectProperties(f.getObjectProperties());
+                    if (s != null) {
+                        result = true;
+                    } else {
+                        result = false;
+                    }
+                    f.setValue(result);
+                    factorValues.add(result);
+                }
+                Boolean result = true;
+                for (Boolean b : factorValues) {
+                    if (!b) {
+                        result = false;
+                        break;
+                    }
+                }
+                t.setValue(result);
+            });
+        });
+        Boolean result = false;
+        for (Term t : expression.getTermList()) {
+            if (t.getValue()) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
+    private static Boolean resolveRelativeFactor(RelativeFactor relativeFactor) {
+        Integer val1 = null, val2 = null;
+        if (relativeFactor.getLeftVariable() != null) {
+            if (variableMap.containsKey(relativeFactor.getLeftVariable())) {
+                try {
+                    val1 = Integer.valueOf(variableMap.get(relativeFactor.getLeftVariable()).toString());
+                } catch (NumberFormatException e) {
+                    throw new IllegalStateException("Bad entry for relative factor - " + relativeFactor.getLeftVariable() + " is not a number");
+                }
+            }
+        }
+        if (relativeFactor.getLeftInteger() != null) {
+            val1 = relativeFactor.getLeftInteger();
+        }
+        if (relativeFactor.getLeftArithmetic() != null) {
+            val1 = Integer.valueOf(arithmeticOperation(relativeFactor.getLeftArithmetic()));
+        }
+
+        if (relativeFactor.getRightVariable() != null) {
+            if (variableMap.containsKey(relativeFactor.getRightVariable())) {
+                try {
+                    val2 = Integer.valueOf(variableMap.get(relativeFactor.getRightVariable()).toString());
+                } catch (NumberFormatException e) {
+                    throw new IllegalStateException("Bad entry for relative factor - " + relativeFactor.getRightVariable() + " is not a number");
+                }
+            }
+        }
+        if (relativeFactor.getRightInteger() != null) {
+            val2 = relativeFactor.getRightInteger();
+        }
+        if (relativeFactor.getRightArithmetic() != null) {
+            val2 = Integer.valueOf(arithmeticOperation(relativeFactor.getRightArithmetic()));
+        }
+        Boolean result = false;
+        if (relativeFactor.getOperatorType() != null && val1 != null && val2 != null) {
+            switch (relativeFactor.getOperatorType()) {
+                case LESS:
+                    result = val1 < val2;
+                    break;
+                case MORE:
+                    result = val1 > val2;
+                    break;
+                case EQUAL:
+                    result = val1.equals(val2);
+                    break;
+                case NOT_EQUAL:
+                    result = !val1.equals(val2);
+                    break;
+                case LESS_OR_EQUAL:
+                    result = val1 <= val2;
+                    break;
+                case MORE_OR_EQUAL:
+                    result = val1 >= val2;
+                    break;
+            }
+        } else {
+            throw new IllegalStateException("Bad entry for relative factor");
+        }
+        return result;
     }
 
     private static int searchFunction(SearchFunction statement) throws IllegalStateException {
-        int value = 0;
+        int value;
         if (statement.getParam() != null) {
             value = notificationMap.keySet().stream()
                     .map(n -> {
@@ -456,38 +622,17 @@ public class Asist {
         } else if (statement.getFunctionCall() != null) {
             value = String.valueOf(functionCall(statement.getFunctionCall()));
         } else if (statement.getObjectProperties() != null) {
-            List<String> propertiesList = statement.getObjectProperties().getPropertiesList();
-            // first check if it's now object (containing the newest date)
-            if (propertiesList.size() > 0 && propertiesList.get(0).equals("now")) {
-                if (propertiesList.size() > 2) {
-                    throw new IllegalStateException("to many properties to object now-date");
-                } else {
-                    if (propertiesList.get(1).equals("day")) {
-                        value = new SimpleDateFormat("dd").format(new Date());
-                    } else if (propertiesList.get(1).equals("month")) {
-                        value = new SimpleDateFormat("MM").format(new Date());
-                    } else if (propertiesList.get(1).equals("year")) {
-                        value = new SimpleDateFormat("yyyy").format(new Date());
-                    } else if (propertiesList.get(1).equals("hour")) {
-                        value = new SimpleDateFormat("HH").format(new Date());
-                    } else if (propertiesList.get(1).equals("minute")) {
-                        value = new SimpleDateFormat("mm").format(new Date());
-                    } else if (propertiesList.get(1).equals("second")) {
-                        value = new SimpleDateFormat("ss").format(new Date());
-                    } else {
-                        throw new IllegalStateException(propertiesList.get(1));
-                    }
-                }
-            } else if (propertiesList.size() > 0 && packageMap.containsKey(propertiesList.get(0))) {
-                // @TODO then check if it's from some package
-            } else {
-                // else throw exception
-                throw new IllegalStateException(propertiesList
-                        .stream()
-                        .collect(Collectors.joining(", ")));
+            try {
+                value = getObjectProperties(statement.getObjectProperties());
+            } catch (IllegalStateException e) {
+                throw e;
             }
         } else if (statement.getArithmeticOperation() != null) {
-            value = arithmeticOperation(statement.getArithmeticOperation());
+            try {
+                value = arithmeticOperation(statement.getArithmeticOperation());
+            } catch (Exception e) {
+                throw e;
+            }
         }
         variableMap.put(identifier, value);
     }

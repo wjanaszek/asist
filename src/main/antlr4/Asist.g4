@@ -54,13 +54,24 @@ params: ALL | (IDENTIFIER | INTEGER_NUMBER | STRING)*;
 
 // IF/ELSE STATEMENT
 ifStatement: 'if (' conditionExpression ') then' ifInstructions ('else' elseInstructions)? 'endif';
-conditionExpression: simpleExpression (RELATIVE_OPERATOR simpleExpression)*;
 ifInstructions: instruction+;
 elseInstructions: instruction+;
 instruction: searchFunction | variableOrAssignment | ifStatement | notificationStatement | functionCall;
-simpleExpression: term ('or' term)*;
+conditionExpression: term ('or' term)*;
 term: factor ('and' factor)*;
-factor: variable | '(' arithmeticOperation ')' | 'not' factor | INTEGER_NUMBER | objectProperties;
+factor: relativeFactor | notVariable | variable | '(' arithmeticOperation ')' | INTEGER_NUMBER | objectProperties;
+relativeFactor: relativeArithmeticArithmetic | relativeVariableVariable | relativeIntegerInteger | relativeArithmeticInteger | relativeArithmeticVariable
+    | relativeVariableArithmetic | relativeVariableInteger | relativeIntegerVariable | relativeIntegerArithmetic;
+relativeArithmeticArithmetic: '(' arithmeticOperation ')' RELATIVE_OPERATOR '(' arithmeticOperation ')';
+relativeVariableVariable: variable RELATIVE_OPERATOR variable;
+relativeIntegerInteger: INTEGER_NUMBER RELATIVE_OPERATOR INTEGER_NUMBER;
+relativeArithmeticInteger: '(' arithmeticOperation ')' RELATIVE_OPERATOR INTEGER_NUMBER;
+relativeArithmeticVariable: '(' arithmeticOperation ')' RELATIVE_OPERATOR variable;
+relativeVariableArithmetic: variable RELATIVE_OPERATOR '(' arithmeticOperation ')';
+relativeVariableInteger: variable RELATIVE_OPERATOR INTEGER_NUMBER;
+relativeIntegerVariable: INTEGER_NUMBER RELATIVE_OPERATOR variable;
+relativeIntegerArithmetic: INTEGER_NUMBER RELATIVE_OPERATOR '(' arithmeticOperation ')';
+notVariable: 'not' variable;
 
 /*
  * Lexer Rules

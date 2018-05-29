@@ -13,6 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ConditionExpression {
-    private List<SimpleExpression> simpleExpressionList;
-    private List<RelativeOperatorType> relativeOperatorList;
+    // list of "or" connected term
+    private List<Term> termList;
 }

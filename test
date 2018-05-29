@@ -5,6 +5,13 @@ b = 5 : 2 + a
 print->(b)
 b = 0 - 5 + 2
 print->(b)
+a = 5
+b = 11
+if (b < 10 or a and (5 + 1) > 10) then
+    print->(b)
+else
+    print->('Cos nie tak')
+endif
 // print->('Hello word')
 // notify test every 1 minute 'test message' with os_notification
 // notify test2 every 10 seconds 'test message 2' with os_notification

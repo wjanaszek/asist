@@ -347,16 +347,6 @@ public interface AsistListener extends ParseTreeListener {
 	 */
 	void exitIfStatement(AsistParser.IfStatementContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link AsistParser#conditionExpression}.
-	 * @param ctx the parse tree
-	 */
-	void enterConditionExpression(AsistParser.ConditionExpressionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link AsistParser#conditionExpression}.
-	 * @param ctx the parse tree
-	 */
-	void exitConditionExpression(AsistParser.ConditionExpressionContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link AsistParser#ifInstructions}.
 	 * @param ctx the parse tree
 	 */
@@ -387,15 +377,15 @@ public interface AsistListener extends ParseTreeListener {
 	 */
 	void exitInstruction(AsistParser.InstructionContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link AsistParser#simpleExpression}.
+	 * Enter a parse tree produced by {@link AsistParser#conditionExpression}.
 	 * @param ctx the parse tree
 	 */
-	void enterSimpleExpression(AsistParser.SimpleExpressionContext ctx);
+	void enterConditionExpression(AsistParser.ConditionExpressionContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link AsistParser#simpleExpression}.
+	 * Exit a parse tree produced by {@link AsistParser#conditionExpression}.
 	 * @param ctx the parse tree
 	 */
-	void exitSimpleExpression(AsistParser.SimpleExpressionContext ctx);
+	void exitConditionExpression(AsistParser.ConditionExpressionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link AsistParser#term}.
 	 * @param ctx the parse tree
@@ -416,4 +406,114 @@ public interface AsistListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitFactor(AsistParser.FactorContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AsistParser#relativeFactor}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelativeFactor(AsistParser.RelativeFactorContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AsistParser#relativeFactor}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelativeFactor(AsistParser.RelativeFactorContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AsistParser#relativeArithmeticArithmetic}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelativeArithmeticArithmetic(AsistParser.RelativeArithmeticArithmeticContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AsistParser#relativeArithmeticArithmetic}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelativeArithmeticArithmetic(AsistParser.RelativeArithmeticArithmeticContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AsistParser#relativeVariableVariable}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelativeVariableVariable(AsistParser.RelativeVariableVariableContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AsistParser#relativeVariableVariable}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelativeVariableVariable(AsistParser.RelativeVariableVariableContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AsistParser#relativeIntegerInteger}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelativeIntegerInteger(AsistParser.RelativeIntegerIntegerContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AsistParser#relativeIntegerInteger}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelativeIntegerInteger(AsistParser.RelativeIntegerIntegerContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AsistParser#relativeArithmeticInteger}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelativeArithmeticInteger(AsistParser.RelativeArithmeticIntegerContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AsistParser#relativeArithmeticInteger}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelativeArithmeticInteger(AsistParser.RelativeArithmeticIntegerContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AsistParser#relativeArithmeticVariable}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelativeArithmeticVariable(AsistParser.RelativeArithmeticVariableContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AsistParser#relativeArithmeticVariable}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelativeArithmeticVariable(AsistParser.RelativeArithmeticVariableContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AsistParser#relativeVariableArithmetic}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelativeVariableArithmetic(AsistParser.RelativeVariableArithmeticContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AsistParser#relativeVariableArithmetic}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelativeVariableArithmetic(AsistParser.RelativeVariableArithmeticContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AsistParser#relativeVariableInteger}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelativeVariableInteger(AsistParser.RelativeVariableIntegerContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AsistParser#relativeVariableInteger}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelativeVariableInteger(AsistParser.RelativeVariableIntegerContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AsistParser#relativeIntegerVariable}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelativeIntegerVariable(AsistParser.RelativeIntegerVariableContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AsistParser#relativeIntegerVariable}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelativeIntegerVariable(AsistParser.RelativeIntegerVariableContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AsistParser#relativeIntegerArithmetic}.
+	 * @param ctx the parse tree
+	 */
+	void enterRelativeIntegerArithmetic(AsistParser.RelativeIntegerArithmeticContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AsistParser#relativeIntegerArithmetic}.
+	 * @param ctx the parse tree
+	 */
+	void exitRelativeIntegerArithmetic(AsistParser.RelativeIntegerArithmeticContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AsistParser#notVariable}.
+	 * @param ctx the parse tree
+	 */
+	void enterNotVariable(AsistParser.NotVariableContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AsistParser#notVariable}.
+	 * @param ctx the parse tree
+	 */
+	void exitNotVariable(AsistParser.NotVariableContext ctx);
 }

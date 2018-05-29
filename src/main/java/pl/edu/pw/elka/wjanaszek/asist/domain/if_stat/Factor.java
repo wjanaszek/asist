@@ -14,8 +14,10 @@ import pl.edu.pw.elka.wjanaszek.asist.domain.variable.ObjectProperties;
 @NoArgsConstructor
 public class Factor {
     private String identifier;
+    private String notIdentifier;
     private ArithmeticOperation arithmeticOperation;
-    private Factor notFactor;
     private Integer integer;
     private ObjectProperties objectProperties;
+    private RelativeFactor relativeFactor;
+    private Boolean value;
 }
