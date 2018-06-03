@@ -349,7 +349,7 @@ public class Asist {
             NotificationTask task = new NotificationTask(
                     false,
                     statement.getMessage(),
-                    statement.getIdentifier()
+                    StringUtil.removeQuotesAndDoubleQuotes(statement.getIdentifier())
             );
             task.setTimeValues(statement, packageMap);
             notificationMap.put(statement.getIdentifier(), task);
@@ -399,7 +399,7 @@ public class Asist {
                 actionTask.setMethod(m);
                 actionTask.setObject(o);
                 actionTask.setParams(params);
-                actionTask.setTitle(statement.getIdentifier());
+                actionTask.setTitle(StringUtil.removeQuotesAndDoubleQuotes(statement.getIdentifier()));
                 actionTask.setActive(false);
                 actionTask.setTimeValues(statement, packageMap);
                 notificationMap.put(statement.getIdentifier(), actionTask);
