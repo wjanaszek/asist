@@ -16,7 +16,7 @@ firedWhen: timeBased | timePrecisely | onEvent;
 timeBased: (every | in) (singleTime | pluralTime);
 singleTime: second | minute | hour;
 pluralTime: INTEGER_NUMBER (seconds | minutes | hours);
-actionType: 'os_notification' | IDENTIFIER;
+actionType: 'os_notification' | IDENTIFIER+;
 // time precisely
 timePrecisely: 'on' TIME DATE?;
 // on event
@@ -81,7 +81,7 @@ FALSE: F A L S E;
 ALL: A L L;
 IMPORT: I M P O R T;
 NOTIFY: N O T I F Y;
-IDENTIFIER: LETTER (LETTER | DIGIT | '_')*;
+IDENTIFIER: LETTER (LETTER | DIGIT | '_' | '@')*;
 SEARCH_FUNCTION: 'list all';
 STRING: '"' (LETTER | .)*? '"' | '\'' (LETTER | .)*? '\'';
 INTEGER_NUMBER: NON_ZERO_DIGIT DIGIT* | DIGIT;

@@ -4,17 +4,18 @@ import pl.edu.pw.elka.wjanaszek.asist.domain.Script;
 import pl.edu.pw.elka.wjanaszek.asist.domain.function.FunctionCall;
 import pl.edu.pw.elka.wjanaszek.asist.domain.if_stat.*;
 import pl.edu.pw.elka.wjanaszek.asist.domain.import_stat.ImportStatement;
-import pl.edu.pw.elka.wjanaszek.asist.domain.notification.*;
+import pl.edu.pw.elka.wjanaszek.asist.domain.notification.NotificationStatement;
 import pl.edu.pw.elka.wjanaszek.asist.domain.search.SearchFunction;
+import pl.edu.pw.elka.wjanaszek.asist.domain.task.ActionTask;
 import pl.edu.pw.elka.wjanaszek.asist.domain.task.BaseTask;
 import pl.edu.pw.elka.wjanaszek.asist.domain.task.NotificationTask;
 import pl.edu.pw.elka.wjanaszek.asist.domain.variable.*;
 import pl.edu.pw.elka.wjanaszek.asist.parser.ParserImpl;
 import pl.edu.pw.elka.wjanaszek.asist.utils.ClassLoader;
 import pl.edu.pw.elka.wjanaszek.asist.utils.StringUtil;
-import pl.edu.pw.elka.wjanaszek.asist.utils.TimeBasedValues;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,7 +23,6 @@ import java.net.MalformedURLException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -217,6 +217,7 @@ public class Asist {
             }
         } else {
             // check if it is not a method from any imported package
+            // @TODO
             if (statement != null && statement.getIdentifier() != null) {
                 for (String key : packageMap.keySet()) {
                     if (packageMap.containsKey(key)) {
@@ -272,6 +273,7 @@ public class Asist {
             }
         } else if (propertiesList.size() > 0) {
             for (String key : packageMap.keySet()) {
+                // @TODO
                 Field f = null;
                 if (packageMap.containsKey(key)) {
                     try {
@@ -299,30 +301,14 @@ public class Asist {
         return value;
     }
 
-    private static TimeBasedValues getTimeBasedValues(TimeBased timeBased) {
-        TimeBasedValues timeBasedValues = new TimeBasedValues();
-        Integer seconds = null, minutes = null, hours = null;
-        if (timeBased.getPluralTimeType() != null) {
-            seconds = timeBased.getPluralTimeType() == PluralTimeType.SECONDS ? timeBased.getValue() * 1000 : null;
-            minutes = timeBased.getPluralTimeType() == PluralTimeType.MINUTES ? timeBased.getValue() * 60 * 1000 : null;
-            hours = timeBased.getPluralTimeType() == PluralTimeType.HOURS ? timeBased.getValue() * 60 * 60 * 1000 : null;
-        } else if (timeBased.getSingleTimeType() != null) {
-            seconds = timeBased.getSingleTimeType() == SingleTimeType.SECOND ? timeBased.getValue() * 1000 : null;
-            minutes = timeBased.getSingleTimeType() == SingleTimeType.MINUTE ? timeBased.getValue() * 60 * 1000 : null;
-            hours = timeBased.getSingleTimeType() == SingleTimeType.HOUR ? timeBased.getValue() * 60 * 60 * 1000 : null;
-        }
-        timeBasedValues.setSeconds(seconds);
-        timeBasedValues.setMinutes(minutes);
-        timeBasedValues.setHours(hours);
-        return timeBasedValues;
-    }
-
     private static void handleIllegalStateException(IllegalStateException e) {
         if (e.getMessage().equals("unknown")) {
             System.err.println("Unknown error occured");
         } else if (e.getMessage().startsWith("Duplicate id")) {
             System.err.println(e.getMessage());
         } else if (e.getMessage().startsWith("Not initialized")) {
+            System.err.println(e.getMessage());
+        } else if (e.getMessage().startsWith("Problem")) {
             System.err.println(e.getMessage());
         } else if (e.getMessage().startsWith("Bad")) {
             System.err.println(e.getMessage());
@@ -355,7 +341,8 @@ public class Asist {
     }
 
     private static void notification(NotificationStatement statement) throws IllegalStateException {
-        if (statement != null && statement.getActionType() != null && statement.getActionType().equals("os_notification")) {
+        if (statement != null && statement.getActionTypeParams() != null && statement.getActionTypeParams().size() == 1
+                && statement.getActionTypeParams().get(0).equals("os_notification")) {
             if (notificationMap.containsKey(statement.getIdentifier())) {
                 throw new IllegalStateException("Duplicate id " + statement.getIdentifier());
             }
@@ -364,75 +351,62 @@ public class Asist {
                     statement.getMessage(),
                     statement.getIdentifier()
             );
-            if (statement.getFiredWhen().getTimeBased().getType() != null) {
-                TimeBased timeBased = statement.getFiredWhen().getTimeBased();
-                TimeBasedValues timeBasedValues;
-                if (statement.getFiredWhen().getTimeBased().getType() == TimeBasedType.IN) {
-                    timeBasedValues = getTimeBasedValues(timeBased);
-                    if (timeBasedValues.getSeconds() != null) {
-                        task.setDelay(timeBasedValues.getSeconds());
-                        task.setSeconds(timeBasedValues.getSeconds());
-                    } else if (timeBasedValues.getMinutes() != null) {
-                        task.setDelay(timeBasedValues.getMinutes());
-                        task.setMinutes(timeBasedValues.getMinutes());
-                    } else if (timeBasedValues.getHours() != null) {
-                        task.setDelay(timeBasedValues.getHours());
-                        task.setHours(timeBasedValues.getHours());
-                    }
-                } else if (statement.getFiredWhen().getTimeBased().getType() == TimeBasedType.EVERY) {
-                    timeBasedValues = getTimeBasedValues(timeBased);
-                    if (timeBasedValues.getSeconds() != null) {
-                        task.setPeriod(timeBasedValues.getSeconds());
-                        task.setSeconds(timeBasedValues.getSeconds());
-                    } else if (timeBasedValues.getMinutes() != null) {
-                        task.setPeriod(timeBasedValues.getMinutes());
-                        task.setMinutes(timeBasedValues.getMinutes());
-                    } else if (timeBasedValues.getHours() != null) {
-                        task.setPeriod(timeBasedValues.getHours());
-                        task.setHours(timeBasedValues.getHours());
-                    }
-                }
-            } else if (statement.getFiredWhen().getTimePrecisely().getTime() != null) {
-                TimePrecisely timePrecisely = statement.getFiredWhen().getTimePrecisely();
-                String hour, minute, day, month, year, date = "", time = "";
-                if (timePrecisely.getTime() != null) {
-                    hour = timePrecisely.getTime().split("/")[0];
-                    minute = timePrecisely.getTime().split("/")[1];
-                    time = hour + ":" + minute + ":00";
-                }
-                if (timePrecisely.getDate() != null) {
-                    day = timePrecisely.getDate().split("/")[0];
-                    month = timePrecisely.getDate().split("/")[1];
-                    year = timePrecisely.getDate().split("/")[2];
-                    date = day + "-" + month + "-" + year;
-                } else {
-                    date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
-                }
-                date += " " + time;
-                try {
-                    task.setDate(new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").parse(date));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-            } else if (statement.getFiredWhen().getOnEvent() != null) {
-                for (String identifier : statement.getFiredWhen().getOnEvent().getIdentifier()) {
-                    if (!packageMap.containsKey(identifier)) {
-                        throw new IllegalStateException(identifier);
-                    }
-                }
-            }
+            task.setTimeValues(statement, packageMap);
             notificationMap.put(statement.getIdentifier(), task);
             notificationMap.get(statement.getIdentifier()).toggleNotification();
-        } else if (statement != null && statement.getActionType() != null) {
-            String action = statement.getActionType();
-//            for (String key : packageMap.keySet()) {
-//                try {
-//                    Method m = packageMap.get(key).getMethod(action);
-//                    m.invoke(null);
-//                } catch (NoSuchMethodException e) {
-//                    throw new IllegalStateException("Problem with package " + key);
-//                }
-//            }
+        } else if (statement != null && statement.getActionTypeParams() != null && statement.getActionTypeParams().size() >= 1) {
+            List<String> actionTypeParams = statement.getActionTypeParams();
+            ActionTask actionTask = new ActionTask();
+            Method m = null;
+            Object o = null;
+            String[] params = null;
+            for (String key : packageMap.keySet()) {
+                try {
+                    List<String> paramsList = actionTypeParams.size() > 1 ? actionTypeParams.subList(1, actionTypeParams.size()) : null;
+
+                    Class c = packageMap.get(key);
+                    Constructor constructor = c.getConstructor();
+                    constructor.setAccessible(true);
+                    o = constructor.newInstance();
+
+                    List<Class> tmp = new ArrayList<>();
+                    for (int i = 0; i < actionTypeParams.size(); i++) {
+                        tmp.add(String.class);
+                    }
+
+                    System.out.println(tmp.size());
+
+                    Class[] methodParams = new Class[tmp.size()];
+                    tmp.toArray(methodParams);
+
+                    params = new String[paramsList.size() + 1];
+                    paramsList.toArray(params);
+                    params[params.length - 1] = statement.getMessage();
+
+                    m = packageMap.get(key).getDeclaredMethod(statement.getActionTypeParams().get(0), methodParams);
+                    m.setAccessible(true);
+                    break;
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    // method can not be in current package, continue search
+                    m = null;
+                    o = null;
+                    params = null;
+                    continue;
+                }
+            }
+
+            if (m != null && o != null && params != null) {
+                actionTask.setMethod(m);
+                actionTask.setObject(o);
+                actionTask.setParams(params);
+                actionTask.setTitle(statement.getIdentifier());
+                actionTask.setActive(false);
+                actionTask.setTimeValues(statement, packageMap);
+                notificationMap.put(statement.getIdentifier(), actionTask);
+                notificationMap.get(statement.getIdentifier()).toggleNotification();
+            } else {
+                throw new IllegalStateException(statement.getActionTypeParams().get(0));
+            }
         } else {
             throw new IllegalStateException("Bad entry for notification statement");
         }

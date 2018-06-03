@@ -136,8 +136,16 @@ public class ParserImpl implements Parser {
             }
             FiredWhen firedWhen = new FiredWhen(timeBased, timePrecisely, onEvent);
             String message = ctx.STRING() != null ? ctx.STRING().getText() : null;
-            String actionType = ctx.actionType() != null ? ctx.actionType().getText() : null;
-            return new NotificationStatement(identifier, firedWhen, message, actionType);
+            List<String> actionTypeParams = null;
+            if (ctx.actionType() != null) {
+                if (ctx.actionType().IDENTIFIER().size() >= 1) {
+                    // not os_notification
+                    actionTypeParams = ctx.actionType().IDENTIFIER().stream()
+                            .map(i -> i.getText())
+                            .collect(Collectors.toList());
+                }
+            }
+            return new NotificationStatement(identifier, firedWhen, message, actionTypeParams);
         }
     }
 

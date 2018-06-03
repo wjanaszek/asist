@@ -71,34 +71,12 @@ public class NotificationTask extends BaseTask {
         } else {
             this.timer = new Timer(this.title);
             this.active = !this.active;
-            Notification notification = new Notification(this.message, this.title);
-            if (this.date != null) {
-                this.timer.schedule(notification, this.date);
-            } else if (this.seconds != null) {
-                if (this.delay != null) {
-                    this.timer.schedule(notification, this.seconds);
-                } else if (this.period != null) {
-                    this.timer.schedule(notification, 0, this.seconds);
-                }
-            } else if (this.minutes != null) {
-                if (this.delay != null) {
-                    this.timer.schedule(notification, this.minutes);
-                } else if (this.period != null) {
-                    this.timer.schedule(notification, 0, this.minutes);
-                }
-            } else if (this.hours != null) {
-                if (this.delay != null) {
-                    this.timer.schedule(notification, this.hours);
-                } else if (this.period != null) {
-                    this.timer.schedule(notification, 0, this.hours);
-                }
-            }
+            this.dispatchTask(new Notification(this.message, this.title));
         }
     }
 
     @Override
     public String toString() {
         return super.toString();
-
     }
 }

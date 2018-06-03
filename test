@@ -1,3 +1,5 @@
+import Mail
+notify test in 5 seconds 'test' with sendMail subject@subject
 a = 5
 b = 5 * 2 + 3 * 3 * a - 2
 print->(b)
