@@ -217,29 +217,50 @@ public class Asist {
             }
         } else {
             // check if it is not a method from any imported package
-            // @TODO
             if (statement != null && statement.getIdentifier() != null) {
+                Method m = null;
+                Object object = null;
+                String[] params = null;
                 for (String key : packageMap.keySet()) {
-                    if (packageMap.containsKey(key)) {
-                        Method m = null;
-                        try {
-                            m = packageMap.get(key).getMethod(statement.getIdentifier());
-                        } catch (NoSuchMethodException e) {
-                            // method can be in another package
+                    try {
+                        List<String> paramsList = statement.getParams();
+
+                        Class c = packageMap.get(key);
+                        Constructor constructor = c.getConstructor();
+                        constructor.setAccessible(true);
+                        object = constructor.newInstance();
+
+                        List<Class> tmp = new ArrayList<>();
+                        for (int i = 0; i < paramsList.size(); i++) {
+                            tmp.add(String.class);
                         }
 
-                        if (m != null) {
-                            try {
-                                m.invoke(null, statement.getParams());
-                            } catch (IllegalAccessException e) {
-                                throw new IllegalStateException("Bad entry for method " + statement.getIdentifier() + " from package " + key);
-                            } catch (InvocationTargetException e) {
-                                throw new IllegalStateException("Bad entry for method " + statement.getIdentifier() + " from package " + key);
-                            }
-                        }
+                        Class[] methodParams = new Class[tmp.size()];
+                        tmp.toArray(methodParams);
+
+                        params = new String[paramsList.size()];
+                        paramsList.toArray(params);
+
+                        m = c.getDeclaredMethod(statement.getIdentifier(), methodParams);
+                        m.setAccessible(true);
+                        break;
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                        // method can not be in current package, continue search
+                        m = null;
+                        object = null;
+                        params = null;
+                    } catch (NullPointerException e) {
+                        throw new IllegalStateException("Problem with params for function call");
                     }
                 }
-                throw new IllegalStateException(statement.getIdentifier());
+
+                if (m != null && object != null && params != null) {
+                    try {
+                        m.invoke(object, params);
+                    } catch (IllegalAccessException | InvocationTargetException e) {
+                        throw new IllegalStateException(statement.getIdentifier());
+                    }
+                }
             } else {
                 throw new IllegalStateException("Bad function call entry");
             }
@@ -374,16 +395,14 @@ public class Asist {
                         tmp.add(String.class);
                     }
 
-                    System.out.println(tmp.size());
-
                     Class[] methodParams = new Class[tmp.size()];
                     tmp.toArray(methodParams);
 
-                    params = new String[paramsList.size() + 1];
+                    params = new String[paramsList.size() + 2];
                     paramsList.toArray(params);
                     params[params.length - 1] = statement.getMessage();
 
-                    m = packageMap.get(key).getDeclaredMethod(statement.getActionTypeParams().get(0), methodParams);
+                    m = c.getDeclaredMethod(statement.getActionTypeParams().get(0), methodParams);
                     m.setAccessible(true);
                     break;
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -391,7 +410,8 @@ public class Asist {
                     m = null;
                     o = null;
                     params = null;
-                    continue;
+                } catch (NullPointerException e) {
+                    throw new IllegalStateException("Problem with params for notification");
                 }
             }
 
