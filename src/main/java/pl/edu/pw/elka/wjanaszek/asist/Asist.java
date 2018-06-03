@@ -1,6 +1,5 @@
 package pl.edu.pw.elka.wjanaszek.asist;
 
-import com.google.gson.Gson;
 import pl.edu.pw.elka.wjanaszek.asist.domain.Script;
 import pl.edu.pw.elka.wjanaszek.asist.domain.function.FunctionCall;
 import pl.edu.pw.elka.wjanaszek.asist.domain.if_stat.*;
@@ -11,10 +10,15 @@ import pl.edu.pw.elka.wjanaszek.asist.domain.task.BaseTask;
 import pl.edu.pw.elka.wjanaszek.asist.domain.task.NotificationTask;
 import pl.edu.pw.elka.wjanaszek.asist.domain.variable.*;
 import pl.edu.pw.elka.wjanaszek.asist.parser.ParserImpl;
+import pl.edu.pw.elka.wjanaszek.asist.utils.ClassLoader;
 import pl.edu.pw.elka.wjanaszek.asist.utils.StringUtil;
 import pl.edu.pw.elka.wjanaszek.asist.utils.TimeBasedValues;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,8 +31,9 @@ import java.util.stream.Stream;
 public class Asist {
 
     private static Map<String, BaseTask> notificationMap = new HashMap<>();
-    private static final Map<String, Object> packageMap = new HashMap<>();
+    private static final Map<String, Class> packageMap = new HashMap<>();
     private static final Map<String, Object> variableMap = new HashMap<>();
+    private static final ClassLoader classLoader = new ClassLoader();
 
     public static void main(String[] args) {
         if (args.length == 1) {
@@ -211,9 +216,28 @@ public class Asist {
                 throw new IllegalStateException("Bad entry for delete function");
             }
         } else {
-            if (statement != null && statement.getIdentifier() != null && packageMap.containsKey(statement.getIdentifier())) {
-                // @TODO do something package depended
-            } else if (statement != null && statement.getIdentifier() != null && !packageMap.containsKey(statement.getIdentifier())) {
+            // check if it is not a method from any imported package
+            if (statement != null && statement.getIdentifier() != null) {
+                for (String key : packageMap.keySet()) {
+                    if (packageMap.containsKey(key)) {
+                        Method m = null;
+                        try {
+                            m = packageMap.get(key).getMethod(statement.getIdentifier());
+                        } catch (NoSuchMethodException e) {
+                            // method can be in another package
+                        }
+
+                        if (m != null) {
+                            try {
+                                m.invoke(null, statement.getParams());
+                            } catch (IllegalAccessException e) {
+                                throw new IllegalStateException("Bad entry for method " + statement.getIdentifier() + " from package " + key);
+                            } catch (InvocationTargetException e) {
+                                throw new IllegalStateException("Bad entry for method " + statement.getIdentifier() + " from package " + key);
+                            }
+                        }
+                    }
+                }
                 throw new IllegalStateException(statement.getIdentifier());
             } else {
                 throw new IllegalStateException("Bad function call entry");
@@ -224,7 +248,7 @@ public class Asist {
 
     private static String getObjectProperties(ObjectProperties statement) throws IllegalStateException {
         List<String> propertiesList = statement.getPropertiesList();
-        String value = "";
+        String value = null;
         // first check if it's now object (containing the newest date)
         if (propertiesList.size() > 0 && propertiesList.get(0).equals("now")) {
             if (propertiesList.size() > 2) {
@@ -246,13 +270,31 @@ public class Asist {
                     throw new IllegalStateException(propertiesList.get(1));
                 }
             }
-        } else if (propertiesList.size() > 0 && packageMap.containsKey(propertiesList.get(0))) {
-            // @TODO then check if it's from some package
-        } else {
-            // else throw exception
-            throw new IllegalStateException(propertiesList
-                    .stream()
-                    .collect(Collectors.joining(", ")));
+        } else if (propertiesList.size() > 0) {
+            for (String key : packageMap.keySet()) {
+                Field f = null;
+                if (packageMap.containsKey(key)) {
+                    try {
+                        f = packageMap.get(key).getField(propertiesList.get(0));
+                    } catch (NoSuchFieldException e) {
+                        // it can be in another package
+                    }
+
+                    if (f != null) {
+                        try {
+                            value = f.get(propertiesList.get(0)).toString();
+                            break;
+                        } catch (IllegalAccessException e) {
+                            throw new IllegalStateException("Bad entry for object properties " + propertiesList.get(0) + " from package " + key);
+                        }
+                    }
+                }
+            }
+            if (value == null) {
+                throw new IllegalStateException(propertiesList
+                        .stream()
+                        .collect(Collectors.joining(", ")));
+            }
         }
         return value;
     }
@@ -261,13 +303,13 @@ public class Asist {
         TimeBasedValues timeBasedValues = new TimeBasedValues();
         Integer seconds = null, minutes = null, hours = null;
         if (timeBased.getPluralTimeType() != null) {
-            seconds = timeBased.getPluralTimeType() == PluralTimeType.SECONDS ? timeBased.getValue()*1000 : null;
-            minutes = timeBased.getPluralTimeType() == PluralTimeType.MINUTES ? timeBased.getValue()*60*1000 : null;
-            hours = timeBased.getPluralTimeType() == PluralTimeType.HOURS ? timeBased.getValue()*60*60*1000 : null;
+            seconds = timeBased.getPluralTimeType() == PluralTimeType.SECONDS ? timeBased.getValue() * 1000 : null;
+            minutes = timeBased.getPluralTimeType() == PluralTimeType.MINUTES ? timeBased.getValue() * 60 * 1000 : null;
+            hours = timeBased.getPluralTimeType() == PluralTimeType.HOURS ? timeBased.getValue() * 60 * 60 * 1000 : null;
         } else if (timeBased.getSingleTimeType() != null) {
-            seconds = timeBased.getSingleTimeType() == SingleTimeType.SECOND ? timeBased.getValue()*1000 : null;
-            minutes = timeBased.getSingleTimeType() == SingleTimeType.MINUTE ? timeBased.getValue()*60*1000 : null;
-            hours = timeBased.getSingleTimeType() == SingleTimeType.HOUR ? timeBased.getValue()*60*60*1000 : null;
+            seconds = timeBased.getSingleTimeType() == SingleTimeType.SECOND ? timeBased.getValue() * 1000 : null;
+            minutes = timeBased.getSingleTimeType() == SingleTimeType.MINUTE ? timeBased.getValue() * 60 * 1000 : null;
+            hours = timeBased.getSingleTimeType() == SingleTimeType.HOUR ? timeBased.getValue() * 60 * 60 * 1000 : null;
         }
         timeBasedValues.setSeconds(seconds);
         timeBasedValues.setMinutes(minutes);
@@ -284,6 +326,8 @@ public class Asist {
             System.err.println(e.getMessage());
         } else if (e.getMessage().startsWith("Bad")) {
             System.err.println(e.getMessage());
+        } else if (e.getMessage().startsWith("No package")) {
+            System.err.println(e.getMessage());
         } else {
             System.err.println("No element " + e.getMessage() + " found");
         }
@@ -298,8 +342,15 @@ public class Asist {
     }
 
     private static void importPackage(ImportStatement statement) throws IllegalStateException {
-        if (!packageMap.containsKey(statement.getPackageName())) {
-            packageMap.put(statement.getPackageName(), null);
+        if (statement.getPackageName() != null) {
+            if (!packageMap.containsKey(statement.getPackageName())) {
+                try {
+                    Class c = classLoader.loadClass("/packages", statement.getPackageName());
+                    packageMap.put(statement.getPackageName(), c);
+                } catch (MalformedURLException | ClassNotFoundException e) {
+                    throw new IllegalStateException(statement.getPackageName());
+                }
+            }
         }
     }
 
@@ -308,7 +359,6 @@ public class Asist {
             if (notificationMap.containsKey(statement.getIdentifier())) {
                 throw new IllegalStateException("Duplicate id " + statement.getIdentifier());
             }
-            // System.out.println("task to dispatch: " + statement.toString());
             NotificationTask task = new NotificationTask(
                     false,
                     statement.getMessage(),
@@ -373,13 +423,16 @@ public class Asist {
             }
             notificationMap.put(statement.getIdentifier(), task);
             notificationMap.get(statement.getIdentifier()).toggleNotification();
-        } else if (statement != null && statement.getActionType() != null){
-            String type = statement.getActionType();
-            if (packageMap.containsKey(type)) {
-                // @TODO do something package-depended
-            } else {
-                throw new IllegalStateException(type);
-            }
+        } else if (statement != null && statement.getActionType() != null) {
+            String action = statement.getActionType();
+//            for (String key : packageMap.keySet()) {
+//                try {
+//                    Method m = packageMap.get(key).getMethod(action);
+//                    m.invoke(null);
+//                } catch (NoSuchMethodException e) {
+//                    throw new IllegalStateException("Problem with package " + key);
+//                }
+//            }
         } else {
             throw new IllegalStateException("Bad entry for notification statement");
         }
