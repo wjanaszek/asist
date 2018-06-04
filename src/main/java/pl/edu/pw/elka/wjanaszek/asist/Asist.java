@@ -33,7 +33,9 @@ public class Asist {
 
     @Getter
     private static Map<String, BaseTask> notificationMap = new HashMap<>();
+    @Getter
     private static final Map<String, Class> packageMap = new HashMap<>();
+    @Getter
     private static final Map<String, Object> variableMap = new HashMap<>();
     private static final ClassLoader classLoader = new ClassLoader();
 
@@ -276,6 +278,8 @@ public class Asist {
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         throw new IllegalStateException(statement.getIdentifier());
                     }
+                } else {
+                    throw new IllegalStateException(statement.getIdentifier());
                 }
             } else {
                 throw new IllegalStateException("Bad function call entry");
@@ -655,13 +659,6 @@ public class Asist {
                     variableOrAssignment((VariableOrAssignment) s);
                     break;
             }
-        });
-    }
-
-    private static void toggleAllNotifications() {
-        notificationMap.keySet().forEach(k -> {
-            BaseTask task = notificationMap.get(k);
-            task.toggleNotification();
         });
     }
 

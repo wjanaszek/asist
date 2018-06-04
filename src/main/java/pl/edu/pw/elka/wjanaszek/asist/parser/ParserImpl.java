@@ -194,7 +194,7 @@ public class ParserImpl implements Parser {
                 return null;
             }
             List<String> params = new ArrayList<>();
-            if (ctx.params() != null) {
+            if (ctx.params() != null && ctx.params().children != null) {
                 params = ctx.params().children
                         .stream()
                         .map(i -> StringUtil.removeQuotesAndDoubleQuotes(i.getText()))
