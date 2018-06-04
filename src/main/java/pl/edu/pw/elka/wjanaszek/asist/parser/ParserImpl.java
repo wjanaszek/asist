@@ -16,6 +16,7 @@ import pl.edu.pw.elka.wjanaszek.asist.domain.variable.*;
 import pl.edu.pw.elka.wjanaszek.asist.generated.AsistBaseVisitor;
 import pl.edu.pw.elka.wjanaszek.asist.generated.AsistLexer;
 import pl.edu.pw.elka.wjanaszek.asist.generated.AsistParser;
+import pl.edu.pw.elka.wjanaszek.asist.utils.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -196,7 +197,7 @@ public class ParserImpl implements Parser {
             if (ctx.params() != null) {
                 params = ctx.params().children
                         .stream()
-                        .map(i -> i.getText())
+                        .map(i -> StringUtil.removeQuotesAndDoubleQuotes(i.getText()))
                         .collect(Collectors.toList());
             }
             return new FunctionCall(identifier, params);

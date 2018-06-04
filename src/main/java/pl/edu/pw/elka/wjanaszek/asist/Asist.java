@@ -189,24 +189,38 @@ public class Asist {
             System.out.println(message);
         } else if (statement != null && statement.getIdentifier() != null && statement.getIdentifier().equals("turn_off")) {
             if (statement.getParams() != null && statement.getParams().size() > 0 && statement.getParams().get(0).equals("all")) {
-                toggleAllNotifications();
+                notificationMap.keySet().forEach(k -> {
+                    BaseTask task = notificationMap.get(k);
+                    if (task.getActive()) {
+                        task.toggleNotification();
+                    }
+                });
             } else if (statement.getParams() != null) {
                 notificationMap.keySet().stream()
                         .filter(k -> k.equals(statement.getParams().get(0)))
                         .forEach(k -> {
                             BaseTask task = notificationMap.get(k);
-                            task.toggleNotification();
+                            if (task.getActive()) {
+                                task.toggleNotification();
+                            }
                         });
             }
         } else if (statement != null && statement.getIdentifier() != null && statement.getIdentifier().equals("turn_on")) {
             if (statement.getParams() != null && statement.getParams().size() > 0 && statement.getParams().get(0).equals("all")) {
-                toggleAllNotifications();
+                notificationMap.keySet().forEach(k -> {
+                    BaseTask task = notificationMap.get(k);
+                    if (!task.getActive()) {
+                        task.toggleNotification();
+                    }
+                });
             } else if (statement.getParams() != null)
                 notificationMap.keySet().stream()
                         .filter(k -> k.equals(statement.getParams().get(0)))
                         .forEach(k -> {
                             BaseTask task = notificationMap.get(k);
-                            task.toggleNotification();
+                            if (!task.getActive()) {
+                                task.toggleNotification();
+                            }
                         });
         } else if (statement != null && statement.getIdentifier() != null && statement.getIdentifier().equals("delete")) {
             if (statement.getParams() != null && statement.getParams().size() > 0 && statement.getParams().get(0).equals("all")) {
