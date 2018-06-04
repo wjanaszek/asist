@@ -16,7 +16,7 @@ firedWhen: timeBased | timePrecisely | onEvent;
 timeBased: (every | in) (singleTime | pluralTime);
 singleTime: second | minute | hour;
 pluralTime: INTEGER_NUMBER (seconds | minutes | hours);
-actionType: 'os_notification' | IDENTIFIER+;
+actionType: IDENTIFIER+;
 // time precisely
 timePrecisely: 'on' TIME DATE?;
 // on event

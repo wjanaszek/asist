@@ -139,7 +139,6 @@ public class ParserImpl implements Parser {
             List<String> actionTypeParams = null;
             if (ctx.actionType() != null) {
                 if (ctx.actionType().IDENTIFIER().size() >= 1) {
-                    // not os_notification
                     actionTypeParams = ctx.actionType().IDENTIFIER().stream()
                             .map(i -> i.getText())
                             .collect(Collectors.toList());

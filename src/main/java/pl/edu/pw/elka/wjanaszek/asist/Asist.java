@@ -1,5 +1,6 @@
 package pl.edu.pw.elka.wjanaszek.asist;
 
+import lombok.Getter;
 import pl.edu.pw.elka.wjanaszek.asist.domain.Script;
 import pl.edu.pw.elka.wjanaszek.asist.domain.function.FunctionCall;
 import pl.edu.pw.elka.wjanaszek.asist.domain.if_stat.*;
@@ -30,6 +31,7 @@ import java.util.stream.Stream;
 
 public class Asist {
 
+    @Getter
     private static Map<String, BaseTask> notificationMap = new HashMap<>();
     private static final Map<String, Class> packageMap = new HashMap<>();
     private static final Map<String, Object> variableMap = new HashMap<>();
@@ -398,7 +400,7 @@ public class Asist {
                     Class[] methodParams = new Class[tmp.size()];
                     tmp.toArray(methodParams);
 
-                    params = new String[paramsList.size() + 2];
+                    params = new String[paramsList.size() + 1];
                     paramsList.toArray(params);
                     params[params.length - 1] = statement.getMessage();
 
@@ -610,7 +612,7 @@ public class Asist {
         });
     }
 
-    private static void serveSource(String source) throws IllegalStateException {
+    public static void serveSource(String source) throws IllegalStateException {
         Script script;
         try {
             script = new ParserImpl().parse(source);
